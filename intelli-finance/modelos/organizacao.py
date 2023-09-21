@@ -1,0 +1,3 @@
+class Organizacao:
+    def __init__(self):
+        ...
