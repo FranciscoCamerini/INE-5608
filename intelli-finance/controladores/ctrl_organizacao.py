@@ -22,3 +22,6 @@ class ControladorOrganizacao:
             self.__tela.popup("Organização cadastrada com sucesso!")
 
         cb()
+
+    def edita_organizacao(self, cb=None):
+        pass

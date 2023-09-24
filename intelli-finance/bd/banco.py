@@ -46,3 +46,9 @@ class Banco:
         organizacoes = self.__pega_tabela("organizacao")
         organizacoes[org.nome] = org.dados_organizacao()
         self.__atualiza_tabela("organizacao", organizacoes)
+
+    def deleta_organizacao(self, nome: str):
+        organizacoes = self.__pega_tabela("organizacao")
+        del organizacoes[nome]
+        self.__atualiza_tabela("organizacao", organizacoes)
+

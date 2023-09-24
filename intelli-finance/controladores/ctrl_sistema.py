@@ -13,9 +13,6 @@ class ControladorSistema:
     def cadastra_usuario(self):
         self.__ctrl_usuario.realiza_cadastro(cb=self.iniciar)
 
-    def cria_organizacao(self):
-        self.__ctrl_organizacao.cadastra_organizacao(cb=self.iniciar)
-
     def login(self):
         ...
 
@@ -23,7 +20,6 @@ class ControladorSistema:
         opcoes = {
             "cadastrar": self.cadastra_usuario,
             "logar": self.login,
-            "criar_org": self.cria_organizacao
         }
 
         opcao_escolhida = self.__tela.opcoes()
