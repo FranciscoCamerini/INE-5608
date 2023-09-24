@@ -44,5 +44,5 @@ class Banco:
 
     def inclui_organizacao(self, org: Organizacao):
         organizacoes = self.__pega_tabela("organizacao")
-        organizacoes[org.nome] = {}
+        organizacoes[org.nome] = org.dados_organizacao()
         self.__atualiza_tabela("organizacao", organizacoes)

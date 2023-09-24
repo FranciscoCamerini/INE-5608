@@ -10,6 +10,7 @@ class TelaInicial(Tela):
             [
                 [self.titulo("Bem Vindo(a) ao Intelli-Finance!")],
                 [self.botao("Fazer Login", chave="logar")],
+                [self.botao("Criar org", chave="criar_org")],
                 [
                     self.botao(
                         "Cadastrar Usuário", chave="cadastrar", pad=((0, 0), (10, 60))
