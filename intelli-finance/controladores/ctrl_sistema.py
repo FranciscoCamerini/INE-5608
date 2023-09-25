@@ -12,7 +12,7 @@ class ControladorSistema:
         self.__ctrl_usuario.realiza_cadastro(cb=self.iniciar)
 
     def login(self):
-        self.__ctrl_usuario.login()
+        self.__ctrl_usuario.login(cb=self.iniciar)
 
     def iniciar(self):
         opcoes = {
