@@ -41,7 +41,7 @@ class Tela(ABC):
     def texto(self, texto: str, estilo: str = "normal"):
         return sg.Text(texto, size=(25, 1), font=("arial", 16, estilo))
 
-    def botao(self, texto_botao: str, chave: str, pad: int = 0):
+    def botao(self, texto_botao: str, chave: str, pad: int = 0, cor: str = "blue"):
         return sg.Button(
             texto_botao,
             key=chave,
@@ -49,6 +49,7 @@ class Tela(ABC):
             font=("arial", 16, "normal"),
             border_width=2,
             pad=pad,
+            button_color=cor,
         )
 
     def atualiza_tela(self, layout: dict, extra: dict = None):

@@ -17,6 +17,7 @@ class TelaInicial(Tela):
                         "Cadastrar Usuário", chave="cadastrar", pad=((0, 0), (10, 60))
                     )
                 ],
+                [self.botao("Editar Usuario", chave="editar", pad=((0, 0), (0, 10)))],
                 [self.botao("Encerrar", chave="encerrar", pad=((0, 0), (0, 10)))],
             ],
             {"element_justification": "center"},

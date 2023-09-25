@@ -13,6 +13,9 @@ class ControladorSistema:
     def cadastra_usuario(self):
         self.__ctrl_usuario.realiza_cadastro(cb=self.iniciar)
 
+    def edita_usuario(self):
+        self.__ctrl_usuario.edita_cadastro(usuario=None, cb=self.iniciar)
+
     def cria_organizacao(self):
         self.__ctrl_organizacao.cadastra_organizacao(cb=self.iniciar)
 
@@ -25,6 +28,7 @@ class ControladorSistema:
     def iniciar(self):
         opcoes = {
             "cadastrar": self.cadastra_usuario,
+            "editar": self.edita_usuario,
             "logar": self.login,
             "criar_org": self.cria_organizacao,
             "editar_org": self.edita_organizacao,

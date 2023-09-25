@@ -15,9 +15,8 @@ class ControladorOrganizacao:
 
                 return self.cadastra_organizacao(cb)
 
-            organizacao = Organizacao(
-                dados["nome"], dados["descrição"]
-            )
+            organizacao = Organizacao(dados["nome"], dados["descrição"])
+            # organizacao.define_proprietario()
             self.__banco.inclui_organizacao(organizacao)
             self.__tela.popup("Organização cadastrada com sucesso!")
 

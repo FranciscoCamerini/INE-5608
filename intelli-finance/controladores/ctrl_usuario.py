@@ -9,7 +9,8 @@ class ControladorUsuario:
         self.__banco = Banco()
 
     def realiza_cadastro(self, cb=None):
-        if dados := self.__tela.cadastro_usuario():
+        _, dados = self.__tela.cadastro_usuario()
+        if dados:
             if self.__banco.pega_usuario(dados["email"]):
                 self.__tela.popup("Este email já foi cadastrado!")
 
@@ -44,3 +45,20 @@ class ControladorUsuario:
     def tela_principal(self):
         self.__tela.popup("LOGIN efetuado com sucesso")
         pass
+
+    def edita_cadastro(self, usuario: Usuario, cb=None):
+        acao, dados = self.__tela.cadastro_usuario(
+            dados={"nome": "abc", "email": "abc@mail.com", "sobre": "abcdef"},
+            atualizacao=True,
+        )
+        if usuario and not usuario.valida_senha(dados["senha"]):
+            self.__tela.popup("A senha está incorreta.")
+            return cb()
+
+        if acao == "deletar":
+            # self.__banco.deleta_usuario("abc")
+            self.__tela.popup("Cadastro removido com sucesso!")
+        elif acao == "confirmar":
+            ...
+
+        cb()

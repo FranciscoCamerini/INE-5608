@@ -2,7 +2,8 @@ import os
 import pickle
 from pathlib import Path
 
-from modelos.usuario import Usuario
+import simplecrypto
+
 from modelos.organizacao import Organizacao
 
 
@@ -31,16 +32,21 @@ class Banco:
         with open(PATH_DADOS, "wb") as arquivo:
             pickle.dump(dados, arquivo)
 
-    def pega_usuario(self, email: str) -> Usuario | None:
+    def pega_usuario(self, email: str):
         return self.__pega_tabela("usuario").get(email)
 
     def pega_organizacao(self, nome: str) -> Organizacao | None:
         return self.__pega_tabela("organizacao").get(nome)
 
-    def inclui_usuario(self, usuario: Usuario):
+    def inclui_usuario(self, usuario):
         usuarios = self.__pega_tabela("usuario")
         usuarios[usuario.email] = usuario.dados_cadastro()
         self.__atualiza_tabela("usuario", usuarios)
+
+    def deleta_usuario(self, usuario):
+        organizacoes = self.__pega_tabela("organizacao")
+        organizacoes.pop(usuario.email, None)
+        self.__atualiza_tabela("organizacao", organizacoes)
 
     def inclui_organizacao(self, org: Organizacao):
         organizacoes = self.__pega_tabela("organizacao")
@@ -49,6 +55,5 @@ class Banco:
 
     def deleta_organizacao(self, nome: str):
         organizacoes = self.__pega_tabela("organizacao")
-        del organizacoes[nome]
+        organizacoes.pop(nome, None)
         self.__atualiza_tabela("organizacao", organizacoes)
-
