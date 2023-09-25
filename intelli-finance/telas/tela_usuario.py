@@ -7,6 +7,51 @@ class TelaUsuario(Tela):
     def __init__(self):
         super().__init__()
 
+    def principal(self, nome_usuario):
+        self.atualiza_tela(
+            [
+                [self.titulo(f"Olá, {nome_usuario.capitalize()}!")],
+                [self.botao("Organizações", chave="org")],
+                [
+                    self.botao(
+                        "Editar Meu Perfil", chave="editar", pad=((0, 0), (10, 10))
+                    )
+                ],
+                [self.botao("Deslogar", chave="logoff", pad=((0, 0), (20, 10)))],
+            ],
+            {"element_justification": "center"},
+        )
+        acao, dados = self.abrir()
+        self.fechar()
+
+        return acao, dados
+
+    def organizacoes(self, organizacoes_p, organizacoes_a, organizacoes_f):
+        elemento_orgs_p = []
+        for org in organizacoes_p:
+            elemento_orgs_p.append(
+                [self.texto(org.nome), self.botao("Editar", f"editar-{org.nome}")],
+            )
+
+        self.atualiza_tela(
+            [
+                [self.titulo("Suas Organizações:")],
+                [self.texto("Proprietário:")],
+                elemento_orgs_p,
+                [
+                    self.botao("Voltar", chave="voltar", pad=((0, 50), (70, 10))),
+                    self.botao(
+                        "Criar Organização", chave="criar_org", pad=((0, 50), (70, 10))
+                    ),
+                ],
+            ],
+            {"element_justification": "center"},
+        )
+        acao, dados = self.abrir()
+        self.fechar()
+
+        return acao, dados
+
     def login_usuario(self):
         self.atualiza_tela(
             [
@@ -57,7 +102,9 @@ class TelaUsuario(Tela):
                 [
                     self.texto("Email:"),
                     self.input("email", valor=dados.get("email", "")),
-                ],
+                ]
+                if not atualizacao
+                else [],
                 [self.texto("Sobre:")],
                 [self.input_grande("sobre", valor=dados.get("sobre", ""))],
                 *senhas,
@@ -67,7 +114,7 @@ class TelaUsuario(Tela):
         acao, dados = self.abrir()
         self.fechar()
         if acao == "confirmar":
-            if not re.match(r"^\S+@\S+\.\S+$", dados["email"]):
+            if not atualizacao and not re.match(r"^\S+@\S+\.\S+$", dados["email"]):
                 self.popup("Entre um email válido!")
 
                 return self.cadastro_usuario(dados, atualizacao)

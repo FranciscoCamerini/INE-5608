@@ -34,6 +34,9 @@ class ControladorSistema:
             "editar_org": self.edita_organizacao,
         }
 
-        opcao_escolhida = self.__tela.opcoes()
-        if funcao := opcoes.get(opcao_escolhida):
-            funcao()
+        while True:
+            opcao_escolhida = self.__tela.opcoes()
+            if funcao := opcoes.get(opcao_escolhida):
+                funcao()
+            else:
+                break

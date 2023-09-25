@@ -2,9 +2,8 @@ import os
 import pickle
 from pathlib import Path
 
-import simplecrypto
-
 from modelos.organizacao import Organizacao
+from modelos.usuario import Usuario
 
 
 PATH_DADOS = Path(os.path.join(Path(__file__).parent.resolve(), "dados"))
@@ -38,22 +37,56 @@ class Banco:
     def pega_organizacao(self, nome: str) -> Organizacao | None:
         return self.__pega_tabela("organizacao").get(nome)
 
-    def inclui_usuario(self, usuario):
+    def inclui_usuario(self, usuario: Usuario):
         usuarios = self.__pega_tabela("usuario")
-        usuarios[usuario.email] = usuario.dados_cadastro()
+        usuarios[usuario.email] = usuario
+        self.__atualiza_tabela("usuario", usuarios)
+
+    def altera_usuario(self, email, usuario: Usuario):
+        usuarios = self.__pega_tabela("usuario")
+        usuarios.pop(email, None)
+        usuarios[usuario.email] = usuario
         self.__atualiza_tabela("usuario", usuarios)
 
     def deleta_usuario(self, usuario):
-        organizacoes = self.__pega_tabela("organizacao")
-        organizacoes.pop(usuario.email, None)
-        self.__atualiza_tabela("organizacao", organizacoes)
+        usuarios = self.__pega_tabela("organizacao")
+        usuarios.pop(usuario.email, None)
+        org_p, _, _ = self.organizacoes_para_usuario(usuario)
+        for org in org_p:
+            self.deleta_organizacao(org.nome)
+
+        self.__atualiza_tabela("usuario", usuarios)
 
     def inclui_organizacao(self, org: Organizacao):
         organizacoes = self.__pega_tabela("organizacao")
-        organizacoes[org.nome] = org.dados_organizacao()
+        organizacoes[org.nome] = org
+        self.__atualiza_tabela("organizacao", organizacoes)
+
+    def altera_organizacao(self, nome_org: str, org: Organizacao):
+        organizacoes = self.__pega_tabela("organizacao")
+        organizacoes.pop(nome_org, None)
+        organizacoes[org.nome] = org
         self.__atualiza_tabela("organizacao", organizacoes)
 
     def deleta_organizacao(self, nome: str):
         organizacoes = self.__pega_tabela("organizacao")
         organizacoes.pop(nome, None)
         self.__atualiza_tabela("organizacao", organizacoes)
+
+    def organizacoes_para_usuario(self, usuario: Usuario):
+        organizacoes = self.__pega_tabela("organizacao")
+        organizacoes_p = []  # Organizacoes proprietario
+        organizacoes_a = []  # Organizacoes admin
+        organizacoes_f = []  # Organizacoes funcionario
+
+        for org in organizacoes.values():
+            status = org.status_usuario(usuario)
+            match status:
+                case "proprietario":
+                    organizacoes_p.append(org)
+                case "administrador":
+                    organizacoes_a.append(org)
+                case "funcionario_restrito":
+                    organizacoes_f.append(org)
+
+        return organizacoes_p, organizacoes_a, organizacoes_f

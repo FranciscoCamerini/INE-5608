@@ -17,6 +17,14 @@ class Organizacao:
     def proprietario(self):
         return self.__proprietario
 
+    def status_usuario(self, usuario):
+        if self.proprietario.email == usuario.email:
+            return "proprietario"
+        elif usuario in self.__administradores:
+            return "administrador"
+        elif usuario in self.__funcionarios_restritos:
+            return "funcionario_restrito"
+
     def define_proprietario(self, usuario: Usuario):
         self.__proprietario = usuario
 

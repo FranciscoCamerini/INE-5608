@@ -1,6 +1,6 @@
 import simplecrypto
 
-CHAVE = "9a8f5c84d8e7b5a13c1dfe842dbf6b4ac0e932c3cdd4f1a862e1547d62c09a5"
+CHAVE = "9a8f5c84d8e7b5a13c1dfe842dbf6b4a"
 
 
 class Usuario:
@@ -14,8 +14,12 @@ class Usuario:
     def email(self):
         return self.__email
 
+    @property
+    def nome(self):
+        return self.__nome
+
     def valida_senha(self, senha):
-        return str(simplecrypto.decrypt(self.__senha, CHAVE)) == senha
+        return simplecrypto.decrypt(self.__senha, CHAVE).decode("ascii") == senha
 
     def dados_cadastro(self):
         return {
