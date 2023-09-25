@@ -8,7 +8,26 @@ class TelaUsuario(Tela):
         super().__init__()
 
     def login_usuario(self):
-        ...
+        self.atualiza_tela(
+            [
+                [self.texto("Email:"), self.input("email")],
+                [self.texto("Senha:"), self.input_senha("senha")],
+                [
+                    self.botao("Cancelar", "cancelar", pad=((0, 0), (35, 10))),
+                    self.botao("Confirmar", "confirmar", pad=((85, 0), (35, 10))),
+                ],
+            ]
+        )
+        acao, dados = self.abrir()
+        if acao == "confirmar":
+            if any(not dado for dado in dados.values()):
+                self.popup("Favor preencher todos os campos!")
+
+                return self.login_usuario()
+
+            return dados
+
+        self.fechar()
 
     def cadastro_usuario(self) -> (dict, None):
         self.atualiza_tela(

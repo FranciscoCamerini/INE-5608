@@ -20,7 +20,7 @@ class ControladorSistema:
         self.__ctrl_organizacao.edita_organizacao(cb=self.iniciar)
 
     def login(self):
-        ...
+        self.__ctrl_usuario.login(cb=self.iniciar)
 
     def iniciar(self):
         opcoes = {
