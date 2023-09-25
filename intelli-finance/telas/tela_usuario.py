@@ -19,6 +19,7 @@ class TelaUsuario(Tela):
             ]
         )
         acao, dados = self.abrir()
+        self.fechar()
         if acao == "confirmar":
             if any(not dado for dado in dados.values()):
                 self.popup("Favor preencher todos os campos!")
@@ -26,8 +27,6 @@ class TelaUsuario(Tela):
                 return self.login_usuario()
 
             return dados
-
-        self.fechar()
 
     def cadastro_usuario(self) -> (dict, None):
         self.atualiza_tela(
@@ -45,6 +44,7 @@ class TelaUsuario(Tela):
             ]
         )
         acao, dados = self.abrir()
+        self.fechar()
         if acao == "confirmar":
             if not re.match(r"^\S+@\S+\.\S+$", dados["email"]):
                 self.popup("Entre um email válido!")
@@ -60,7 +60,4 @@ class TelaUsuario(Tela):
                 self.popup("Favor preencher todos os campos!")
 
                 return self.cadastro_usuario()
-
             return dados
-
-        self.fechar()

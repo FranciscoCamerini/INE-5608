@@ -23,21 +23,23 @@ class ControladorUsuario:
 
         cb()
 
-    def login(self, cb = None):
+    def login(self, cb=None):
         if dados := self.__tela.login_usuario():
             usuario = self.__banco.pega_usuario(dados["email"])
-            if usuario: # Usuário existe
-                if dados['senha'] == usuario["senha"]: #Login efetuado com sucesso
+            if usuario:  # Usuário existe
+                print(usuario.valida_senha())
+                if dados["senha"] == usuario["senha"]:  # Login efetuado com sucesso
                     self.tela_principal()
                 else:
                     self.__tela.popup("Senha incorreta")
                     self.login(cb)
-            else: # Não existe usuário com este email
-                self.__tela.popup("Não há cadastro com esse e-mail, por favor, tente novamente com outro e-mail ou cadastre esse.")
+            else:  # Não existe usuário com este email
+                self.__tela.popup(
+                    "Não há cadastro com esse e-mail, por favor, tente novamente com outro e-mail ou cadastre esse."
+                )
                 self.login(cb)
-        
+
         cb()
-        
 
     def tela_principal(self):
         self.__tela.popup("LOGIN efetuado com sucesso")
