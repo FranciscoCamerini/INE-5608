@@ -22,3 +22,7 @@ class ControladorUsuario:
             self.__tela.popup("Usuário cadastrado com sucesso!")
 
         cb()
+
+    def login(self):
+        tentativas = 0
+
