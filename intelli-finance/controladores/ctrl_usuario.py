@@ -24,5 +24,14 @@ class ControladorUsuario:
         cb()
 
     def login(self):
-        tentativas = 0
+        dados = self.__tela.login_usuario()
+        usuario = self.__banco.pega_organizacao(dados['email'])
+        if usuario is None:
+            self.__tela.popup("Este E-mail não está registrado. Por favor, tente novamente com outro e-mail ou cadastre esse e-mail.")
+        else:
+            if usuario['senha'] == dados['senha']:
+                self.tela_principal()
+        
 
+    def tela_principal(self):
+        pass
