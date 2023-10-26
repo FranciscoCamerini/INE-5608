@@ -24,7 +24,9 @@ class ControladorOrganizacao:
         return cb(usuario)
 
     def listar_usuarios_org(self, usuario: Usuario, org: Organizacao, cb=None):
-        acao = self.__tela.listar_usuarios(org.dados_organizacao())
+        acao = self.__tela.listar_usuarios(
+            org.dados_organizacao(), org.status_usuario(usuario)
+        )
         if acao == "add":
             acao, dados = self.__tela.adicionar_usuario()
             if acao == "confirmar":
@@ -71,7 +73,9 @@ class ControladorOrganizacao:
 
     def edita_organizacao(self, usuario: Usuario, nome_org: str, cb=None):
         org = self.__banco.pega_organizacao(nome_org)
-        acao, dados = self.__tela.editar_organizacao(org.dados_organizacao())
+        acao, dados = self.__tela.editar_organizacao(
+            org.dados_organizacao(), org.status_usuario(usuario)
+        )
 
         match acao:
             case "salvar":

@@ -19,18 +19,21 @@ class Tela(ABC):
         valor: str = "",
         tamanho: tuple[int] = (35, 30),
         extra: dict = None,
+        **kwargs,
     ):
         if not extra:
             extra = {}
 
-        return sg.InputText(valor, key=chave, size=tamanho, **extra, font=DEFAULT_FONT)
+        return sg.InputText(
+            valor, key=chave, size=tamanho, **extra, **kwargs, font=DEFAULT_FONT
+        )
 
     def input_grande(self, *args, **kwargs):
         return self.input(
             *args,
             **kwargs,
             tamanho=(35, 100),
-            extra={"expand_x": True, "expand_y": True}
+            extra={"expand_x": True, "expand_y": True},
         )
 
     def input_senha(self, *args, **kwargs):

@@ -29,26 +29,44 @@ class TelaOrganizacao(Tela):
 
             return dados
 
-    def editar_organizacao(self, dados):
+    def editar_organizacao(self, dados, status_usuario):
+        pode_alterar_dados = status_usuario == "proprietario"
+
+        botoes = [
+            self.botao("Cancelar", "cancelar", pad=((0, 20), (55, 0))),
+            self.botao("Usuários", "usuarios", pad=((0, 0), (55, 0))),
+            self.botao("Salvar", "salvar", pad=((55, 0), (55, 0))),
+        ]
+
+        if pode_alterar_dados:
+            botoes.insert(
+                2,
+                self.botao(
+                    "Deletar Organização",
+                    "deletar",
+                    pad=((65, 25), (55, 0)),
+                    cor="red",
+                ),
+            )
+
         self.atualiza_tela(
             [
                 [
                     self.texto("Nome da Organização:"),
-                    self.input_grande("nome", valor=dados.get("nome")),
+                    self.input_grande("nome", valor=dados.get("nome"))
+                    if pode_alterar_dados
+                    else self.texto(dados.get("nome")),
                 ],
                 [self.texto("Descrição:")],
-                [self.input_grande("descrição", valor=dados.get("descricao"))],
                 [
-                    self.botao("Cancelar", "cancelar", pad=((0, 20), (55, 0))),
-                    self.botao("Usuários", "usuarios", pad=((0, 0), (55, 0))),
-                    self.botao(
-                        "Deletar Organização",
-                        "deletar",
-                        pad=((65, 25), (55, 0)),
-                        cor="red",
-                    ),
-                    self.botao("Salvar", "salvar", pad=((55, 0), (55, 0))),
+                    self.input_grande(
+                        "descrição",
+                        valor=dados.get("descricao"),
+                    )
+                    if pode_alterar_dados
+                    else self.texto(dados.get("descricao"))
                 ],
+                botoes,
             ]
         )
         acao, dados = self.abrir()
@@ -61,9 +79,11 @@ class TelaOrganizacao(Tela):
 
         return acao, dados
 
-    def listar_usuarios(self, dados):
+    def listar_usuarios(self, dados, status_usuario):
         func_restritos = dados["funcionarios_restritos"]
         administradores = dados["administradores"]
+
+        proprietario = status_usuario == "proprietario"
 
         layout = []
         extra = {}
@@ -75,36 +95,35 @@ class TelaOrganizacao(Tela):
 
         if func_restritos:
             layout.append([self.titulo("Funcionários restritos:")])
-            layout.append(
-                [
-                    [
-                        [[self.texto(usuario.nome)], [self.texto(usuario.email)]],
-                        self.botao("Editar", usuario.email, pad=((0, 0), (0, 40))),
-                    ]
-                    for usuario in func_restritos
+            for usuario in func_restritos:
+                sub_layout = [
+                    [[self.texto(usuario.nome)], [self.texto(usuario.email)]],
                 ]
-            )
+                if proprietario:
+                    sub_layout.append(
+                        self.botao("Editar", usuario.email, pad=((0, 0), (0, 40)))
+                    )
+                layout.append(sub_layout)
 
         if administradores:
             layout.append([self.titulo("Administradores:")])
-            layout.append(
-                [
-                    [
-                        [[self.texto(usuario.nome)], [self.texto(usuario.email)]],
-                        self.botao("Editar", usuario.email),
-                    ]
-                    for usuario in administradores
+            for usuario in administradores:
+                sub_layout = [
+                    [[self.texto(usuario.nome)], [self.texto(usuario.email)]],
                 ]
-            )
+                if proprietario:
+                    sub_layout.append(
+                        self.botao("Editar", usuario.email, pad=((0, 0), (0, 40)))
+                    )
+                layout.append(sub_layout)
 
-        layout.append(
-            [
-                [
-                    self.botao("Voltar", "voltar", pad=((0, 200), (55, 0))),
-                    self.botao("Adicionar Usuário", "add", pad=((0, 0), (55, 0))),
-                ]
-            ]
-        )
+        botoes = [
+            self.botao("Voltar", "voltar", pad=((0, 200), (55, 0))),
+        ]
+        if proprietario:
+            botoes.append(self.botao("Adicionar Usuário", "add", pad=((0, 0), (55, 0))))
+
+        layout.append([botoes])
 
         self.atualiza_tela(layout, extra)
         acao, _ = self.abrir()
