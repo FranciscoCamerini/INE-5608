@@ -2,13 +2,16 @@ import PySimpleGUI as sg
 from abc import abstractmethod, ABC
 
 
+DEFAULT_FONT = ("Arial", 16, "normal")
+
+
 class Tela(ABC):
     @abstractmethod
     def __init__(self):
         sg.theme("Reddit")
 
     def popup(self, msg):
-        sg.Popup("", msg)
+        sg.Popup("", msg, font=DEFAULT_FONT)
 
     def input(
         self,
@@ -20,7 +23,7 @@ class Tela(ABC):
         if not extra:
             extra = {}
 
-        return sg.InputText(valor, key=chave, size=tamanho, **extra)
+        return sg.InputText(valor, key=chave, size=tamanho, **extra, font=DEFAULT_FONT)
 
     def input_grande(self, *args, **kwargs):
         return self.input(
@@ -46,11 +49,14 @@ class Tela(ABC):
             texto_botao,
             key=chave,
             size=(16, 1),
-            font=("arial", 16, "normal"),
+            font=DEFAULT_FONT,
             border_width=2,
             pad=pad,
             button_color=cor,
         )
+
+    def dropdown(self, escolhas: [str], default=None):
+        return sg.Combo(escolhas, default, font=DEFAULT_FONT)
 
     def atualiza_tela(self, layout: dict, extra: dict = None):
         extra = {} if not extra else dict(extra)
