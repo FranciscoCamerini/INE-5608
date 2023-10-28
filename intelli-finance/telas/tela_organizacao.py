@@ -75,7 +75,7 @@ class TelaOrganizacao(Tela):
             if any(not dado for dado in dados.values()):
                 self.popup("Favor preencher todos os campos!")
 
-                return self.editar_organizacao(dados)
+                return self.editar_organizacao(dados, status_usuario)
 
         return acao, dados
 
@@ -118,7 +118,7 @@ class TelaOrganizacao(Tela):
                 layout.append(sub_layout)
 
         botoes = [
-            self.botao("Voltar", "voltar", pad=((0, 200), (55, 0))),
+            self.botao("Voltar", "voltar", pad=((0, 50), (55, 0))),
         ]
         if proprietario:
             botoes.append(self.botao("Adicionar Usuário", "add", pad=((0, 0), (55, 0))))
