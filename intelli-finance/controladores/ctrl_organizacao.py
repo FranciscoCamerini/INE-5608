@@ -77,7 +77,7 @@ class ControladorOrganizacao:
 
         self.edita_organizacao(usuario, org.nome, cb)
 
-    def listar_categorias_org(self, usuario: Usuario, org: Organizacao, cb=None): # EDITAR ESSA PORRA TODA
+    def listar_categorias_org(self, usuario: Usuario, org: Organizacao, cb=None):
         acao = self.__tela.listar_categorias(
             org.dados_organizacao(), org.status_usuario(usuario)
         )
@@ -86,14 +86,20 @@ class ControladorOrganizacao:
             # dados = {'nome': str, categoria: 'Receita' || 'Despesa', 'descricao': str}
             if acao == "confirmar":
                 try:
-                    org.adiciona_categoria(Categoria(dados['nome'], dados['categoria'], dados['descricao']))
+                    org.adiciona_categoria(
+                        Categoria(dados['nome'], dados['categoria'], dados['descricao'])
+                    )
                 except FileExistsError:
-                    self.__tela.popup(f"Já existe uma categoria com nome '{dados['nome']}'")
+                    self.__tela.popup(
+                        f"Já existe uma categoria com nome '{dados['nome']}'"
+                    )
                 else:
                     self.__tela.popup("Categoria adicionado!")
                 self.__banco.altera_organizacao(org.nome, org)
 
             return self.listar_categorias_org(usuario, org, cb)
+
+        self.edita_organizacao(usuario, org.nome, cb)
 
 
     def edita_organizacao(self, usuario: Usuario, nome_org: str, cb=None):

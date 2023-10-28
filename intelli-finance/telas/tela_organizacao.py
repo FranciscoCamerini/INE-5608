@@ -1,5 +1,3 @@
-import re
-
 from telas.tela_base import Tela
 
 
@@ -33,15 +31,15 @@ class TelaOrganizacao(Tela):
         pode_alterar_dados = status_usuario == "proprietario"
 
         botoes = [
-            self.botao("Cancelar", "cancelar", pad=((0, 20), (55, 0))),
+            self.botao("Voltar", "cancelar", pad=((0, 20), (55, 0))),
             self.botao("Usuários", "usuarios", pad=((0, 0), (55, 0))),
             self.botao("Categorias", "categorias", pad=((20, 0), (55, 0))),
-            self.botao("Salvar", "salvar", pad=((55, 0), (55, 0))),
         ]
 
         if pode_alterar_dados:
+            botoes.append(self.botao("Salvar", "salvar", pad=((55, 0), (55, 0))))
             botoes.insert(
-                2,
+                3,
                 self.botao(
                     "Deletar Organização",
                     "deletar",
@@ -114,7 +112,7 @@ class TelaOrganizacao(Tela):
 
         return acao
 
-    def adicionar_categoria(self):  # FEITO
+    def adicionar_categoria(self):
         self.atualiza_tela(
             [
                 [self.texto("Nome:")],
