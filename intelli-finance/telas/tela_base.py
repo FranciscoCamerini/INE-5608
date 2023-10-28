@@ -2,13 +2,16 @@ import PySimpleGUI as sg
 from abc import abstractmethod, ABC
 
 
+DEFAULT_FONT = ("Arial", 16, "normal")
+
+
 class Tela(ABC):
     @abstractmethod
     def __init__(self):
         sg.theme("Reddit")
 
     def popup(self, msg):
-        sg.Popup("", msg)
+        sg.Popup("", msg, font=DEFAULT_FONT)
 
     def radio(self, text: str, group_id: str ="RADIO1", default: bool =False, key=None):
         return sg.Radio(text, group_id, default=default, key=key)
@@ -19,18 +22,21 @@ class Tela(ABC):
         valor: str = "",
         tamanho: tuple[int] = (35, 30),
         extra: dict = None,
+        **kwargs,
     ):
         if not extra:
             extra = {}
 
-        return sg.InputText(valor, key=chave, size=tamanho, **extra)
+        return sg.InputText(
+            valor, key=chave, size=tamanho, **extra, **kwargs, font=DEFAULT_FONT
+        )
 
     def input_grande(self, *args, **kwargs):
         return self.input(
             *args,
             **kwargs,
             tamanho=(35, 100),
-            extra={"expand_x": True, "expand_y": True}
+            extra={"expand_x": True, "expand_y": True},
         )
 
     def input_senha(self, *args, **kwargs):
@@ -41,19 +47,22 @@ class Tela(ABC):
             texto, justification=alinhamento, size=(40, 3), font=("arial", 24, "bold")
         )
 
-    def texto(self, texto: str, estilo: str = "normal"):
-        return sg.Text(texto, size=(25, 1), font=("arial", 16, estilo))
+    def texto(self, texto: str, estilo: str = "normal", size=(25, 1)):
+        return sg.Text(texto, size=size, font=("arial", 16, estilo))
 
     def botao(self, texto_botao: str, chave: str, pad: int = 0, cor: str = "blue"):
         return sg.Button(
             texto_botao,
             key=chave,
             size=(16, 1),
-            font=("arial", 16, "normal"),
+            font=DEFAULT_FONT,
             border_width=2,
             pad=pad,
             button_color=cor,
         )
+
+    def dropdown(self, escolhas: [str], default=None):
+        return sg.Combo(escolhas, default, font=DEFAULT_FONT)
 
     def atualiza_tela(self, layout: dict, extra: dict = None):
         extra = {} if not extra else dict(extra)

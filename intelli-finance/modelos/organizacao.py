@@ -1,4 +1,5 @@
 from modelos.usuario import Usuario
+from modelos.categoria import Categoria
 
 
 class Organizacao:
@@ -8,10 +9,23 @@ class Organizacao:
         self.__proprietario: Usuario = None
         self.__administradores: list[Usuario] = []
         self.__funcionarios_restritos: list[Usuario] = []
+        self.__categorias: list[Categoria] = []
 
     @property
     def nome(self):
         return self.__nome
+
+    @nome.setter
+    def nome(self, nome):
+        self.__nome = nome
+
+    @property
+    def descricao(self):
+        return self.__descricao
+
+    @descricao.setter
+    def descricao(self, descricao):
+        self.__nome = descricao
 
     @property
     def proprietario(self):
@@ -20,19 +34,48 @@ class Organizacao:
     def status_usuario(self, usuario):
         if self.proprietario.email == usuario.email:
             return "proprietario"
-        elif usuario in self.__administradores:
+        elif usuario.email in [u.email for u in self.__administradores]:
             return "administrador"
-        elif usuario in self.__funcionarios_restritos:
+        elif usuario.email in [u.email for u in self.__funcionarios_restritos]:
             return "funcionario_restrito"
 
     def define_proprietario(self, usuario: Usuario):
         self.__proprietario = usuario
 
     def adiciona_administrador(self, usuario: Usuario):
+        for func in self.__funcionarios_restritos:
+            if func.email == usuario.email:
+                self.__funcionarios_restritos.remove(func)
+
         self.__administradores.append(usuario)
 
     def adiciona_funcionario_restrito(self, usuario: Usuario):
+        for adm in self.__administradores:
+            if adm.email == usuario.email:
+                self.__administradores.remove(adm)
+
         self.__funcionarios_restritos.append(usuario)
+
+    def remove_usuario(self, usuario):
+        for adm in self.__administradores:
+            if adm.email == usuario.email:
+                self.__administradores.remove(adm)
+                return
+
+        for func in self.__funcionarios_restritos:
+            if func.email == usuario.email:
+                self.__funcionarios_restritos.remove(func)
+                return
+
+    def adiciona_categoria(self, categoria: Categoria):
+        for categ in self.__categorias:
+            if categ.nome == categoria.nome:
+                raise FileExistsError
+        else:
+            self.__categorias.append(categoria)
+
+    def remove_categoria(self, categoria: Categoria):
+        self.__categorias.remove(categoria)
 
     def dados_organizacao(self):
         return {
@@ -41,4 +84,5 @@ class Organizacao:
             "proprietario": self.__proprietario,
             "administradores": self.__administradores,
             "funcionarios_restritos": self.__funcionarios_restritos,
+            "categorias": self.__categorias
         }

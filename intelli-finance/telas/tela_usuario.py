@@ -30,14 +30,30 @@ class TelaUsuario(Tela):
         elemento_orgs_p = []
         for org in organizacoes_p:
             elemento_orgs_p.append(
-                [self.texto(org.nome), self.botao("Editar", f"editar-{org.nome}")],
+                [self.texto(org.nome), self.botao("Acessar", f"editar-{org.nome}")],
+            )
+
+        elemento_orgs_a = []
+        for org in organizacoes_a:
+            elemento_orgs_a.append(
+                [self.texto(org.nome), self.botao("Acessar", f"editar-{org.nome}")],
+            )
+
+        elemento_orgs_f = []
+        for org in organizacoes_f:
+            elemento_orgs_f.append(
+                [self.texto(org.nome), self.botao("Acessar", f"editar-{org.nome}")],
             )
 
         self.atualiza_tela(
             [
                 [self.titulo("Suas Organizações:")],
-                [self.texto("Proprietário:")],
+                [self.texto("Proprietário:" if organizacoes_p else "")],
                 elemento_orgs_p,
+                [self.texto("Administrador:" if organizacoes_a else "")],
+                elemento_orgs_a,
+                [self.texto("Funcionário Restrito:" if organizacoes_f else "")],
+                elemento_orgs_f,
                 [
                     self.botao("Voltar", chave="voltar", pad=((0, 50), (70, 10))),
                     self.botao(
