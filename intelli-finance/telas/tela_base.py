@@ -44,8 +44,8 @@ class Tela(ABC):
             texto, justification=alinhamento, size=(40, 3), font=("arial", 24, "bold")
         )
 
-    def texto(self, texto: str, estilo: str = "normal"):
-        return sg.Text(texto, size=(25, 1), font=("arial", 16, estilo))
+    def texto(self, texto: str, estilo: str = "normal", size=(25, 1)):
+        return sg.Text(texto, size=size, font=("arial", 16, estilo))
 
     def botao(self, texto_botao: str, chave: str, pad: int = 0, cor: str = "blue"):
         return sg.Button(

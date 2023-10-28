@@ -1,4 +1,5 @@
 from modelos.usuario import Usuario
+from modelos.categoria import Categoria
 
 
 class Organizacao:
@@ -8,6 +9,7 @@ class Organizacao:
         self.__proprietario: Usuario = None
         self.__administradores: list[Usuario] = []
         self.__funcionarios_restritos: list[Usuario] = []
+        self.__categorias: list[Categoria] = []
 
     @property
     def nome(self):
@@ -65,6 +67,16 @@ class Organizacao:
                 self.__funcionarios_restritos.remove(func)
                 return
 
+    def adiciona_categoria(self, categoria: Categoria):
+        for categ in self.__categorias:
+            if categ.nome == categoria.nome:
+                raise FileExistsError
+        else:
+            self.__categorias.append(categoria)
+
+    def remove_categoria(self, categoria: Categoria):
+        self.__categorias.remove(categoria)
+
     def dados_organizacao(self):
         return {
             "nome": self.__nome,
@@ -72,4 +84,5 @@ class Organizacao:
             "proprietario": self.__proprietario,
             "administradores": self.__administradores,
             "funcionarios_restritos": self.__funcionarios_restritos,
+            "categorias": self.__categorias
         }

@@ -2,6 +2,7 @@ from telas.tela_organizacao import TelaOrganizacao
 from bd.banco import Banco
 from modelos.organizacao import Organizacao
 from modelos.usuario import Usuario
+from modelos.categoria import Categoria
 
 
 class ControladorOrganizacao:
@@ -76,6 +77,25 @@ class ControladorOrganizacao:
 
         self.edita_organizacao(usuario, org.nome, cb)
 
+    def listar_categorias_org(self, usuario: Usuario, org: Organizacao, cb=None): # EDITAR ESSA PORRA TODA
+        acao = self.__tela.listar_categorias(
+            org.dados_organizacao(), org.status_usuario(usuario)
+        )
+        if acao == "add":
+            acao, dados = self.__tela.adicionar_categoria()
+            # dados = {'nome': str, categoria: 'Receita' || 'Despesa', 'descricao': str}
+            if acao == "confirmar":
+                try:
+                    org.adiciona_categoria(Categoria(dados['nome'], dados['categoria'], dados['descricao']))
+                except FileExistsError:
+                    self.__tela.popup(f"Já existe uma categoria com nome '{dados['nome']}'")
+                else:
+                    self.__tela.popup("Categoria adicionado!")
+                self.__banco.altera_organizacao(org.nome, org)
+
+            return self.listar_categorias_org(usuario, org, cb)
+
+
     def edita_organizacao(self, usuario: Usuario, nome_org: str, cb=None):
         org = self.__banco.pega_organizacao(nome_org)
         acao, dados = self.__tela.editar_organizacao(
@@ -100,5 +120,7 @@ class ControladorOrganizacao:
             case "deletar":
                 self.__banco.deleta_organizacao(nome_org)
                 self.__tela.popup("Organização deletada com sucesso!")
+            case "categorias":
+                return self.listar_categorias_org(usuario, org, cb)
 
         return cb(usuario)

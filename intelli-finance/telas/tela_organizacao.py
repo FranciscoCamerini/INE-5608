@@ -33,12 +33,13 @@ class TelaOrganizacao(Tela):
         pode_alterar_dados = status_usuario == "proprietario"
 
         botoes = [
-            self.botao("Voltar", "cancelar", pad=((0, 20), (55, 0))),
+            self.botao("Cancelar", "cancelar", pad=((0, 20), (55, 0))),
             self.botao("Usuários", "usuarios", pad=((0, 0), (55, 0))),
+            self.botao("Categorias", "categorias", pad=((20, 0), (55, 0))),
+            self.botao("Salvar", "salvar", pad=((55, 0), (55, 0))),
         ]
 
         if pode_alterar_dados:
-            botoes.append(self.botao("Salvar", "salvar", pad=((55, 0), (55, 0))))
             botoes.insert(
                 2,
                 self.botao(
@@ -76,6 +77,75 @@ class TelaOrganizacao(Tela):
                 self.popup("Favor preencher todos os campos!")
 
                 return self.editar_organizacao(dados, status_usuario)
+
+        return acao, dados
+
+    def listar_categorias(self, dados: dict, status_usuario: str):
+        # dados = {'nome': str, categoria: 'Receita' || 'Despesa', 'descricao': str}
+        categorias = dados["categorias"]
+        editor = status_usuario == "administrador" or status_usuario == "proprietario"
+        layout = []
+        extra = {}
+        if not categorias:
+            extra["size"] = (400, 200)
+            layout.append(
+                [self.texto("Sua organização não possui categorias de transação.")]
+            )
+        else:
+            layout.append([self.titulo("Categorias de transação")])
+            for categ in categorias:
+                sub_layout = [
+                    [[self.texto(f"{categ.nome} -> {categ.tipo}", size=(60, 1))]]
+                ]
+                layout.append(sub_layout)
+        botoes = [
+            self.botao("Voltar", "voltar", pad=((0, 50), (55, 0))),
+        ]
+        if editor:
+            botoes.append(
+                self.botao("Adicionar Categoria", "add", pad=((0, 0), (55, 0)))
+            )
+
+        layout.append([botoes])
+
+        self.atualiza_tela(layout, extra)
+        acao, _ = self.abrir()
+        self.fechar()
+
+        return acao
+
+    def adicionar_categoria(self):  # FEITO
+        self.atualiza_tela(
+            [
+                [self.texto("Nome:")],
+                [self.input("nome")],
+                [self.texto("Categoria:")],
+                [
+                    self.dropdown(
+                        ["Receita", "Despesa"],
+                        "Receita",
+                    )
+                ],
+                [self.texto("Descrição")],
+                [self.input_grande("descricao")],
+                [
+                    self.botao("Cancelar", "cancelar", pad=((0, 30), (55, 0))),
+                    self.botao("Confirmar", "confirmar", pad=((0, 0), (55, 0))),
+                ],
+            ]
+        )
+        acao, dados = self.abrir()
+        self.fechar()
+
+        if dados[0] == "Receita":
+            dados["categoria"] = "Receita"
+        else:
+            dados["categoria"] = "Despesa"
+        # dados = {'nome': str, categoria: 'Receita' || 'Despesa', 'descricao': str}
+        if any(not dado for dado in dados.values()):
+            self.popup("Favor preencher todos os campos!")
+
+            return self.adicionar_categoria()
 
         return acao, dados
 
@@ -118,7 +188,7 @@ class TelaOrganizacao(Tela):
                 layout.append(sub_layout)
 
         botoes = [
-            self.botao("Voltar", "voltar", pad=((0, 50), (55, 0))),
+            self.botao("Voltar", "voltar", pad=((0, 20), (55, 0))),
         ]
         if proprietario:
             botoes.append(self.botao("Adicionar Usuário", "add", pad=((0, 0), (55, 0))))
