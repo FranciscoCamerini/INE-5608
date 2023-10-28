@@ -41,7 +41,7 @@ class TelaUsuario(Tela):
 
         elemento_orgs_f = []
         for org in organizacoes_f:
-            elemento_orgs_p.append(
+            elemento_orgs_f.append(
                 [self.texto(org.nome), self.botao("Acessar", f"editar-{org.nome}")],
             )
 
