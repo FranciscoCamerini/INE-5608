@@ -51,9 +51,13 @@ class Banco:
     def deleta_usuario(self, usuario):
         usuarios = self.__pega_tabela("organizacao")
         usuarios.pop(usuario.email, None)
-        org_p, _, _ = self.organizacoes_para_usuario(usuario)
+        org_p, org_a, org_f = self.organizacoes_para_usuario(usuario)
         for org in org_p:
             self.deleta_organizacao(org.nome)
+        for org in org_a:
+            org.remove_usuario(usuario)
+        for org in org_f:
+            org.remove_usuario(usuario)
 
         self.__atualiza_tabela("usuario", usuarios)
 

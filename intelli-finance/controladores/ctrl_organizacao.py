@@ -16,7 +16,7 @@ class ControladorOrganizacao:
 
                 return self.cadastra_organizacao(usuario, cb)
 
-            organizacao = Organizacao(dados["nome"], dados["descrição"])
+            organizacao = Organizacao(dados["nome"], dados["descricao"])
             organizacao.define_proprietario(usuario)
             self.__banco.inclui_organizacao(organizacao)
             self.__tela.popup("Organização cadastrada com sucesso!")
@@ -32,7 +32,12 @@ class ControladorOrganizacao:
             if acao == "confirmar":
                 novo_usuario = self.__banco.pega_usuario(dados["email"])
                 if not novo_usuario:
-                    self.__tela.popup("Usuário Inexistente")
+                    self.__tela.popup("Usuário Inexistente!")
+                    return self.listar_usuarios_org(usuario, org, cb)
+
+                if org.status_usuario(novo_usuario):
+                    self.__tela.popup("Usuário já membro da Organização!")
+                    return self.listar_usuarios_org(usuario, org, cb)
 
                 if dados["status"] == "administrador":
                     org.adiciona_administrador(novo_usuario)
