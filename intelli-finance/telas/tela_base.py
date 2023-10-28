@@ -10,6 +10,9 @@ class Tela(ABC):
     def popup(self, msg):
         sg.Popup("", msg)
 
+    def radio(self, text: str, group_id: str ="RADIO1", default: bool =False, key=None):
+        return sg.Radio(text, group_id, default=default, key=key)
+
     def input(
         self,
         chave: str,

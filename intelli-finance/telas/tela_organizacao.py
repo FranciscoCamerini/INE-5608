@@ -24,7 +24,6 @@ class TelaOrganizacao(Tela):
         if acao == "criar":
             if any(not dado for dado in dados.values()):
                 self.popup("Favor preencher todos os campos!")
-
                 return self.criar_organizacao()
 
             return dados
@@ -59,3 +58,4 @@ class TelaOrganizacao(Tela):
                 return self.editar_organizacao(dados)
 
         return acao, dados
+    
