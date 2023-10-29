@@ -202,9 +202,9 @@ class TelaOrganizacao(Tela):
     def adicionar_usuario(self):
         self.atualiza_tela(
             [
-                [self.texto("Email:")],
+                [self.texto("Email do Usuário:")],
                 [self.input("email")],
-                [self.texto("Cargo:")],
+                [self.texto("Tipo do Usuário:")],
                 [
                     self.dropdown(
                         ["Administrador", "Funcionário Restrito"],
@@ -215,7 +215,7 @@ class TelaOrganizacao(Tela):
                 [self.input_senha("senha")],
                 [
                     self.botao("Cancelar", "cancelar", pad=((0, 30), (55, 0))),
-                    self.botao("Confirmar", "confirmar", pad=((0, 0), (55, 0))),
+                    self.botao("Adicionar", "confirmar", pad=((0, 0), (55, 0))),
                 ],
             ]
         )
@@ -234,8 +234,7 @@ class TelaOrganizacao(Tela):
             [
                 [self.texto(f"Nome: {dados_usuario['nome']}")],
                 [self.texto(f"Email: {dados_usuario['email']}")],
-                [self.texto(f"Sobre: {dados_usuario['sobre']}")],
-                [self.texto("Cargo:")],
+                [self.texto("Tipo do Usuário:")],
                 [
                     self.dropdown(
                         ["Administrador", "Funcionário Restrito"],
@@ -254,7 +253,7 @@ class TelaOrganizacao(Tela):
                         pad=((0, 10), (55, 0)),
                         cor="red",
                     ),
-                    self.botao("Confirmar", "confirmar", pad=((0, 0), (55, 0))),
+                    self.botao("Salvar", "confirmar", pad=((0, 0), (55, 0))),
                 ],
             ]
         )
