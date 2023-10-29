@@ -84,5 +84,5 @@ class Organizacao:
             "proprietario": self.__proprietario,
             "administradores": self.__administradores,
             "funcionarios_restritos": self.__funcionarios_restritos,
-            "categorias": self.__categorias
+            "categorias": self.__categorias,
         }

@@ -199,7 +199,7 @@ class TelaOrganizacao(Tela):
 
         return acao
 
-    def adicionar_usuario(self):
+    def pega_dados_adicionar_usuario(self):
         self.atualiza_tela(
             [
                 [self.texto("Email do Usuário:")],

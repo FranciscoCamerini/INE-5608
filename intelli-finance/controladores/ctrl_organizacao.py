@@ -19,71 +19,74 @@ class ControladorOrganizacao:
 
             organizacao = Organizacao(dados["nome"], dados["descricao"])
             organizacao.define_proprietario(usuario)
-            self.__banco.inclui_organizacao(organizacao)
+            self.__banco.salva_organizacao(organizacao)
             self.__tela.popup("Organização cadastrada com sucesso!")
 
         return cb(usuario)
+
+    def adicionar_usuario(self, org, proprietario):
+        acao, dados = self.__tela.pega_dados_adicionar_usuario()
+        if acao == "confirmar":
+            senha_valida = proprietario.valida_senha(dados["senha"])
+            if not senha_valida:
+                self.__tela.popup("Senha incorreta!")
+                return
+
+            novo_usuario = self.__banco.pega_usuario(dados["email"])
+            if not novo_usuario:
+                self.__tela.popup("Usuário Inexistente!")
+                return
+
+            if org.status_usuario(novo_usuario):
+                self.__tela.popup("Usuário já membro da Organização!")
+                return
+
+            if dados["status"] == "administrador":
+                org.adiciona_administrador(novo_usuario)
+            elif dados["status"] == "funcionario_restrito":
+                org.adiciona_funcionario_restrito(novo_usuario)
+
+            self.__banco.salva_organizacao(org)
+            self.__tela.popup("Usuário adicionado!")
+
+    def editar_usuario(self, proprietario, org, email):
+        usuario_editar = self.__banco.pega_usuario(email)
+
+        status = org.status_usuario(usuario_editar)
+        acao, dados = self.__tela.edita_status_usuario(
+            usuario_editar.dados_cadastro(),
+            status,
+        )
+
+        if not proprietario.valida_senha(dados["senha"]):
+            self.__tela.popup("Senha incorreta!")
+            return
+
+        if acao == "confirmar":
+            if dados["status"] != org.status_usuario(usuario_editar):
+                if dados["status"] == "administrador":
+                    org.adiciona_administrador(usuario_editar)
+                elif dados["status"] == "funcionario_restrito":
+                    org.adiciona_funcionario_restrito(usuario_editar)
+
+            self.__banco.altera_organizacao(org.nome, org)
+            self.__tela.popup("Status de usuário alterado com sucesso!")
+        elif acao == "remover":
+            org.remove_usuario(usuario_editar)
+
+            self.__banco.altera_organizacao(org.nome, org)
+            self.__tela.popup("Usuário removido com sucesso!")
 
     def listar_usuarios_org(self, usuario: Usuario, org: Organizacao, cb=None):
         acao = self.__tela.listar_usuarios(
             org.dados_organizacao(), org.status_usuario(usuario)
         )
         if acao == "add":
-            acao, dados = self.__tela.adicionar_usuario()
-            if acao == "confirmar":
-                if not usuario.valida_senha(dados["senha"]):
-                    self.__tela.popup("Senha incorreta!")
-                    return self.listar_usuarios_org(usuario, org, cb)
-
-                novo_usuario = self.__banco.pega_usuario(dados["email"])
-                if not novo_usuario:
-                    self.__tela.popup("Usuário Inexistente!")
-                    return self.listar_usuarios_org(usuario, org, cb)
-
-                if org.status_usuario(novo_usuario):
-                    self.__tela.popup("Usuário já membro da Organização!")
-                    return self.listar_usuarios_org(usuario, org, cb)
-
-                if dados["status"] == "administrador":
-                    org.adiciona_administrador(novo_usuario)
-                elif dados["status"] == "funcionario_restrito":
-                    org.adiciona_funcionario_restrito(novo_usuario)
-
-                self.__banco.altera_organizacao(org.nome, org)
-                self.__tela.popup("Usuário adicionado!")
+            self.adicionar_usuario(org, usuario)
 
             return self.listar_usuarios_org(usuario, org, cb)
         elif "@" in acao:
-            usuario_editar = self.__banco.pega_usuario(acao)
-
-            status = org.status_usuario(usuario_editar)
-            acao, dados = self.__tela.edita_status_usuario(
-                usuario_editar.dados_cadastro(),
-                status,
-            )
-
-            novo_status = dados["status"]
-            if acao == "confirmar":
-                if not usuario.valida_senha(dados["senha"]):
-                    self.__tela.popup("Senha incorreta!")
-                    return self.listar_usuarios_org(usuario, org, cb)
-
-                if novo_status != status:
-                    if novo_status == "administrador":
-                        org.adiciona_administrador(usuario_editar)
-                    elif novo_status == "funcionario_restrito":
-                        org.adiciona_funcionario_restrito(usuario_editar)
-
-                    self.__banco.altera_organizacao(org.nome, org)
-                    self.__tela.popup("Status de usuário alterado com sucesso!")
-            elif acao == "remover":
-                if not usuario.valida_senha(dados["senha"]):
-                    self.__tela.popup("Senha incorreta!")
-                    return self.listar_usuarios_org(usuario, org, cb)
-
-                org.remove_usuario(usuario_editar)
-                self.__banco.altera_organizacao(org.nome, org)
-                self.__tela.popup("Usuário removido com sucesso!")
+            self.editar_usuario(usuario, org, acao)
 
             return self.listar_usuarios_org(usuario, org, cb)
 

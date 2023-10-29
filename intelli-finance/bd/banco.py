@@ -61,7 +61,7 @@ class Banco:
 
         self.__atualiza_tabela("usuario", usuarios)
 
-    def inclui_organizacao(self, org: Organizacao):
+    def salva_organizacao(self, org: Organizacao):
         organizacoes = self.__pega_tabela("organizacao")
         organizacoes[org.nome] = org
         self.__atualiza_tabela("organizacao", organizacoes)
