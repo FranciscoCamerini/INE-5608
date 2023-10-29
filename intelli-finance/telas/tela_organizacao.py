@@ -1,8 +1,5 @@
-from tela_base import Tela
+from telas.tela_base import Tela
 import re
-
-import PySimpleGUI as sg
-
 
 class TelaOrganizacao(Tela):
     def __init__(self):
@@ -36,6 +33,7 @@ class TelaOrganizacao(Tela):
             self.botao("Voltar", "cancelar", pad=((0, 20), (55, 0))),
             self.botao("Usuários", "usuarios", pad=((0, 0), (55, 0))),
             self.botao("Categorias", "categorias", pad=((20, 0), (55, 0))),
+            self.botao("Registros", "registros", pad=((20, 0), (55, 0))),
         ]
 
         if pode_alterar_dados:
@@ -273,20 +271,20 @@ class TelaOrganizacao(Tela):
         extra = {}
         layout.append([self.texto("Despesas:")])
         if not despesas:
-            extra["size"] = (400, 200)
+           
             layout.append([
                 [self.texto("Sua organização não possui nenhuma despesa.")]
         ]) 
         else:
             for despesa in despesas:
                 sub_layout = [
-                    [[self.texto(f"{despesa.valor} -> {despesa.categoria}", size=(60, 1))]]
+                    [[self.texto(f"{despesa.valor} -> {despesa.categoria}")]]
                 ]
                 layout.append(sub_layout)
 
         layout.append([self.texto("Receitas:")])
         if not receitas:
-            extra["size"] = (400, 200)
+            
             layout.append([
                 [self.texto("Sua organização não possui nenhuma receita.")]
         ]) 
@@ -325,12 +323,12 @@ class TelaOrganizacao(Tela):
         self.atualiza_tela(
             [
                 [self.texto("Tipo:")],
-                [sg.Radio("Receita", "RADIO1", default=True, key="Receita"), sg.Radio("Despesa", "RADIO1", key="Despesa")], 
-                [self.texto("Categoria:"), sg.Combo(["Vendas Feira", "Pagamento Salários", "Reforma Fachada"], default_value="Pagamento Salários", size=(20, 1), key="categoria")],
+                [self.radio("Receita", "RADIO1", default=True, key="Receita"), self.radio("Despesa", "RADIO1", key="Despesa")], 
+                [self.texto("Categoria:"), self.combo(["Vendas Feira", "Pagamento Salários", "Reforma Fachada"], valor_default="Pagamento Salários", tamanho=(20, 1), chave="categoria", readonly=True)],
                 [self.texto("Valor:"), self.input("valor")],       
                 [self.texto("Descrição:")],
-                [sg.Multiline("", size=(25, 3), key="descricao")],
-                [self.texto('Data:'), sg.InputText('', key='data')],
+                [self.multiline("", tamanho=(25, 3), chave="descricao")],
+                [self.texto('Data:'), self.input("data")],
                 [
                     self.botao("Cancelar", "cancelar", pad=((0, 0), (35, 10))),
                     self.botao("Salvar", "salvar", pad=((85, 0), (35, 10))),
@@ -356,19 +354,17 @@ class TelaOrganizacao(Tela):
                 print(dados.values(), "values")
                 return self.adicionar_registro_financeiro()
             
-            # Verifica a validade da data
-            if not validar_data(dados['data']):
-                self.popup("A data precisa estar no formato dd/mm/aaaa.")
-                return self.adicionar_registro_financeiro()
-
             # Verifica a validade do valor
             if not validar_valor(dados['valor']):
                 self.popup("O valor precisa ser um número.")
                 return self.adicionar_registro_financeiro()
             
+            # Verifica a validade da data
+            if not validar_data(dados['data']):
+                self.popup("A data precisa estar no formato dd/mm/aaaa.")
+                return self.adicionar_registro_financeiro()
+            
             return dados
 
-if __name__ == "__main__":
-    tela_org = TelaOrganizacao()
-    org_data = tela_org.adicionar_registro_financeiro()
-    print(org_data)
+
+   

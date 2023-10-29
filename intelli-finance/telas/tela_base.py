@@ -15,6 +15,12 @@ class Tela(ABC):
 
     def radio(self, text: str, group_id: str ="RADIO1", default: bool =False, key=None):
         return sg.Radio(text, group_id, default=default, key=key)
+    
+    def combo(self, valores: list, valor_default: str, tamanho: tuple[int], chave: str, readonly: bool = True):
+        return sg.Combo(valores, default_value=valor_default, size=tamanho, key=chave, readonly=readonly)
+
+    def multiline(self, valor: str, tamanho: tuple[int], chave: str):
+        return sg.Multiline(valor, size=tamanho, key=chave)
 
     def input(
         self,
