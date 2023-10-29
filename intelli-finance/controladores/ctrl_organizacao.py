@@ -31,6 +31,10 @@ class ControladorOrganizacao:
         if acao == "add":
             acao, dados = self.__tela.adicionar_usuario()
             if acao == "confirmar":
+                if not usuario.valida_senha(dados["senha"]):
+                    self.__tela.popup("Senha incorreta!")
+                    return self.listar_usuarios_org(usuario, org, cb)
+
                 novo_usuario = self.__banco.pega_usuario(dados["email"])
                 if not novo_usuario:
                     self.__tela.popup("Usuário Inexistente!")
@@ -60,6 +64,10 @@ class ControladorOrganizacao:
 
             novo_status = dados["status"]
             if acao == "confirmar":
+                if not usuario.valida_senha(dados["senha"]):
+                    self.__tela.popup("Senha incorreta!")
+                    return self.listar_usuarios_org(usuario, org, cb)
+
                 if novo_status != status:
                     if novo_status == "administrador":
                         org.adiciona_administrador(usuario_editar)
@@ -69,6 +77,10 @@ class ControladorOrganizacao:
                     self.__banco.altera_organizacao(org.nome, org)
                     self.__tela.popup("Status de usuário alterado com sucesso!")
             elif acao == "remover":
+                if not usuario.valida_senha(dados["senha"]):
+                    self.__tela.popup("Senha incorreta!")
+                    return self.listar_usuarios_org(usuario, org, cb)
+
                 org.remove_usuario(usuario_editar)
                 self.__banco.altera_organizacao(org.nome, org)
                 self.__tela.popup("Usuário removido com sucesso!")

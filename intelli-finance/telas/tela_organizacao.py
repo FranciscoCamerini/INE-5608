@@ -211,6 +211,8 @@ class TelaOrganizacao(Tela):
                         "Funcionário Restrito",
                     )
                 ],
+                [self.texto("Confirme sua senha:")],
+                [self.input_senha("senha")],
                 [
                     self.botao("Cancelar", "cancelar", pad=((0, 30), (55, 0))),
                     self.botao("Confirmar", "confirmar", pad=((0, 0), (55, 0))),
@@ -242,6 +244,8 @@ class TelaOrganizacao(Tela):
                         else "Administrador",
                     )
                 ],
+                [self.texto("Confirme sua senha:")],
+                [self.input_senha("senha")],
                 [
                     self.botao("Cancelar", "cancelar", pad=((0, 40), (55, 0))),
                     self.botao(
