@@ -37,7 +37,8 @@ class ControladorOrganizacao:
                 self.__tela.popup("Usuário Inexistente!")
                 return
 
-            if org.status_usuario(novo_usuario):
+            stauts_atual = org.status_usuario(novo_usuario)
+            if stauts_atual:
                 self.__tela.popup("Usuário já membro da Organização!")
                 return
 
@@ -53,28 +54,31 @@ class ControladorOrganizacao:
         usuario_editar = self.__banco.pega_usuario(email)
 
         status = org.status_usuario(usuario_editar)
+        dados_usuario = usuario_editar.dados_cadastro()
         acao, dados = self.__tela.edita_status_usuario(
-            usuario_editar.dados_cadastro(),
+            dados_usuario,
             status,
         )
 
-        if not proprietario.valida_senha(dados["senha"]):
+        senha_valida = proprietario.valida_senha(dados["senha"])
+        if not senha_valida:
             self.__tela.popup("Senha incorreta!")
             return
 
         if acao == "confirmar":
-            if dados["status"] != org.status_usuario(usuario_editar):
+            status_atual = org.status_usuario(usuario_editar)
+            if dados["status"] != status_atual:
                 if dados["status"] == "administrador":
                     org.adiciona_administrador(usuario_editar)
                 elif dados["status"] == "funcionario_restrito":
                     org.adiciona_funcionario_restrito(usuario_editar)
 
-            self.__banco.altera_organizacao(org.nome, org)
-            self.__tela.popup("Status de usuário alterado com sucesso!")
+                self.__banco.salva_organizacao(org)
+                self.__tela.popup("Status de usuário alterado com sucesso!")
         elif acao == "remover":
             org.remove_usuario(usuario_editar)
 
-            self.__banco.altera_organizacao(org.nome, org)
+            self.__banco.salva_organizacao(org)
             self.__tela.popup("Usuário removido com sucesso!")
 
     def listar_usuarios_org(self, usuario: Usuario, org: Organizacao, cb=None):
