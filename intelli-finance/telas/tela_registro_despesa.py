@@ -1,7 +1,7 @@
 import re
 import PySimpleGUI as sg
 
-from tela_base import Tela
+from telas.tela_base import Tela
 
 class TelaDespesaReceita(Tela):
     def __init__(self):
@@ -62,11 +62,9 @@ class TelaDespesaReceita(Tela):
                 self.popup("Por favor, insira um valor numérico válido!")
                 return self.criar_despesa_receita()
             
-            
-            
             return dados
 
-if __name__ == "__main__":
-    tela_org = TelaDespesaReceita()
-    org_data = tela_org.criar_despesa_receita()
-    print(org_data)
+# if __name__ == "__main__":
+#     tela_org = TelaDespesaReceita()
+#     org_data = tela_org.criar_despesa_receita()
+#     print(org_data)

@@ -1,4 +1,7 @@
-from telas.tela_base import Tela
+from tela_base import Tela
+import re
+
+import PySimpleGUI as sg
 
 
 class TelaOrganizacao(Tela):
@@ -263,3 +266,109 @@ class TelaOrganizacao(Tela):
 
         return acao, dados
     
+    def listar_registros_financeiros(self, dados: dict):
+        despesas = dados["despesas"]
+        receitas = dados["receitas"]
+        layout = []
+        extra = {}
+        layout.append([self.texto("Despesas:")])
+        if not despesas:
+            extra["size"] = (400, 200)
+            layout.append([
+                [self.texto("Sua organização não possui nenhuma despesa.")]
+        ]) 
+        else:
+            for despesa in despesas:
+                sub_layout = [
+                    [[self.texto(f"{despesa.valor} -> {despesa.categoria}", size=(60, 1))]]
+                ]
+                layout.append(sub_layout)
+
+        layout.append([self.texto("Receitas:")])
+        if not receitas:
+            extra["size"] = (400, 200)
+            layout.append([
+                [self.texto("Sua organização não possui nenhuma receita.")]
+        ]) 
+        else:
+            for receita in receitas:
+                sub_layout = [
+                    [[self.texto(f"{receita.valor} -> {receita.categoria}", size=(60, 1))]]
+                ]
+                layout.append(sub_layout)
+        
+        botoes = [
+            self.botao("Voltar", "voltar", pad=((0, 50), (55, 0))),
+            self.botao("Adicionar Registro", "add", pad=((0, 0), (55, 0)))
+        ]
+
+        layout.append([botoes])
+
+        self.atualiza_tela(layout, extra)
+        acao, _ = self.abrir()
+        self.fechar()
+
+        return acao
+    
+    def adicionar_registro_financeiro(self):
+
+        def validar_data(data: str) -> bool:
+            """Valida se a data está no formato dd/mm/aaaa."""
+            pattern = re.compile(r'^\d{2}/\d{2}/\d{4}$')
+            return bool(pattern.match(data))
+        
+        def validar_valor(valor: str) -> bool:
+            """Valida se o valor é um número."""
+            pattern = re.compile(r'^\d+(\.\d+)?$')
+            return bool(pattern.match(valor))
+       
+        self.atualiza_tela(
+            [
+                [self.texto("Tipo:")],
+                [sg.Radio("Receita", "RADIO1", default=True, key="Receita"), sg.Radio("Despesa", "RADIO1", key="Despesa")], 
+                [self.texto("Categoria:"), sg.Combo(["Vendas Feira", "Pagamento Salários", "Reforma Fachada"], default_value="Pagamento Salários", size=(20, 1), key="categoria")],
+                [self.texto("Valor:"), self.input("valor")],       
+                [self.texto("Descrição:")],
+                [sg.Multiline("", size=(25, 3), key="descricao")],
+                [self.texto('Data:'), sg.InputText('', key='data')],
+                [
+                    self.botao("Cancelar", "cancelar", pad=((0, 0), (35, 10))),
+                    self.botao("Salvar", "salvar", pad=((85, 0), (35, 10))),
+                ],
+            ]
+        )
+        acao, dados = self.abrir()
+        self.fechar()
+
+        # Determina o tipo e depois exclui as chaves indesejadas
+        if dados.get("Receita"):
+            dados['tipo'] = "Receita"
+        else:
+            dados['tipo'] = "Despesa"
+        del dados["Receita"]
+        del dados["Despesa"]
+
+        if acao == "salvar":
+
+            # Verifica se existem dados faltando
+            if any(not dado for dado in dados.values()):
+                self.popup("Favor preencher todos os campos!")
+                print(dados.values(), "values")
+                return self.adicionar_registro_financeiro()
+            
+            # Verifica a validade da data
+            if not validar_data(dados['data']):
+                self.popup("A data precisa estar no formato dd/mm/aaaa.")
+                return self.adicionar_registro_financeiro()
+
+            # Verifica a validade do valor
+            if not validar_valor(dados['valor']):
+                self.popup("O valor precisa ser um número.")
+                return self.adicionar_registro_financeiro()
+            
+            return dados
+
+if __name__ == "__main__":
+    tela_org = TelaOrganizacao()
+    org_data = tela_org.adicionar_registro_financeiro()
+    print(org_data)

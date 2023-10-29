@@ -3,6 +3,7 @@ from bd.banco import Banco
 from modelos.organizacao import Organizacao
 from modelos.usuario import Usuario
 from modelos.categoria import Categoria
+from modelos.registro_financeiro import RegistroFinanceiro
 
 
 class ControladorOrganizacao:
@@ -128,5 +129,29 @@ class ControladorOrganizacao:
                 self.__tela.popup("Organização deletada com sucesso!")
             case "categorias":
                 return self.listar_categorias_org(usuario, org, cb)
+            case "registros":
+                return self.listar_registros_financeiros_org(org, cb)
 
         return cb(usuario)
+    
+    def listar_registros_financeiros_org(self, org: Organizacao, cb=None):
+        acao = self.__tela.listar_registros_financeiros(
+            org.dados_organizacao()
+        )
+        if acao == "add":
+            acao, dados = self.__tela.adicionar_registro_financeiro()
+            if acao == "confirmar":
+                if dados.tipo == "Despesa":
+                    org.adiciona_despesa(
+                        RegistroFinanceiro()
+                    )
+                else:
+                    org.adiciona_receita(
+                        RegistroFinanceiro()
+                    )
+                self.__tela.popup("Registro adicionado!")
+                self.__banco.altera_organizacao(org.nome, org)
+
+            return self.listar_registros_financeiros_org(org, cb)
+
+        self.edita_organizacao(org.nome, cb)

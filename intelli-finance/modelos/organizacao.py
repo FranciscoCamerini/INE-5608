@@ -1,5 +1,6 @@
 from modelos.usuario import Usuario
 from modelos.categoria import Categoria
+from modelos.registro_financeiro import RegistroFinanceiro
 
 
 class Organizacao:
@@ -10,6 +11,8 @@ class Organizacao:
         self.__administradores: list[Usuario] = []
         self.__funcionarios_restritos: list[Usuario] = []
         self.__categorias: list[Categoria] = []
+        self.__despesas: list[RegistroFinanceiro]
+        self.__receitas: list[RegistroFinanceiro]
 
     @property
     def nome(self):
@@ -77,6 +80,12 @@ class Organizacao:
     def remove_categoria(self, categoria: Categoria):
         self.__categorias.remove(categoria)
 
+    def adiciona_despesa(self, despesa: RegistroFinanceiro):
+        self.__despesas.append(despesa)
+
+    def adiciona_receita(self, receita: RegistroFinanceiro):
+        self.__receitas.append(receita)
+
     def dados_organizacao(self):
         return {
             "nome": self.__nome,
@@ -84,5 +93,8 @@ class Organizacao:
             "proprietario": self.__proprietario,
             "administradores": self.__administradores,
             "funcionarios_restritos": self.__funcionarios_restritos,
-            "categorias": self.__categorias
+            "categorias": self.__categorias,
+            "despesas": self.__despesas,
+            "receitas": self.__receitas
+
         }

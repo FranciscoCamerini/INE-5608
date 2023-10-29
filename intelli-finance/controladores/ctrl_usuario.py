@@ -18,9 +18,7 @@ class ControladorUsuario:
 
                 return self.realiza_cadastro(cb)
 
-            usuario = Usuario(
-                dados["nome"], dados["email"], dados["sobre"], dados["senha1"]
-            )
+            usuario = Usuario(dados["nome"], dados["email"], dados["sobre"], dados["senha1"])
             self.__banco.inclui_usuario(usuario)
             self.__tela.popup("Usuário cadastrado com sucesso!")
 
