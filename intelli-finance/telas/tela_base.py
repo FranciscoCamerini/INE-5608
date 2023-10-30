@@ -13,8 +13,8 @@ class Tela(ABC):
     def popup(self, msg):
         sg.Popup("", msg, font=DEFAULT_FONT)
 
-    def radio(self, text: str, group_id: str ="RADIO1", default: bool =False, key=None):
-        return sg.Radio(text, group_id, default=default, key=key)
+    def radio(self, text: str, group_id: str ="RADIO1", default: bool =False, key=None, disabled: bool = False):
+        return sg.Radio(text, group_id, default=default, key=key, disabled=disabled )
     
     def combo(self, valores: list, valor_default: str, tamanho: tuple[int], chave: str, readonly: bool = True):
         return sg.Combo(valores, default_value=valor_default, size=tamanho, key=chave, readonly=readonly)

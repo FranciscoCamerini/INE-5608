@@ -1,5 +1,5 @@
 class RegistroFinanceiro:
-    def __init__(self, data: str, descricao: str, valor: str, tipo: str, categoria: str) -> None:
+    def __init__(self, data: str, descricao: str, valor: float, tipo: str, categoria: str) -> None:
         self.__data = data
         self.__descricao = descricao
         self.__valor = valor

@@ -2,7 +2,7 @@ CHAVE = "9a8f5c84d8e7b5a13c1dfe842dbf6b4a"
 
 
 class Usuario:
-    def _init_(self, nome, email, sobre, senha):
+    def __init__(self, nome, email, sobre, senha):
         self.__nome: str = nome
         self.__email: str = email
         self.__sobre: str = sobre

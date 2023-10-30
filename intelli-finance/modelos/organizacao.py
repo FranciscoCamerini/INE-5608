@@ -11,8 +11,8 @@ class Organizacao:
         self.__administradores: list[Usuario] = []
         self.__funcionarios_restritos: list[Usuario] = []
         self.__categorias: list[Categoria] = []
-        self.__despesas: list[RegistroFinanceiro]
-        self.__receitas: list[RegistroFinanceiro]
+        self.__despesas: list[RegistroFinanceiro] = []
+        self.__receitas: list[RegistroFinanceiro] = []
 
     @property
     def nome(self):
@@ -33,6 +33,16 @@ class Organizacao:
     @property
     def proprietario(self):
         return self.__proprietario
+    
+    @property
+    def despesas(self):
+        return self.__despesas
+    
+    @property
+    def receitas(self):
+        return self.__receitas
+    
+    
 
     def status_usuario(self, usuario):
         if self.proprietario.email == usuario.email:
@@ -96,5 +106,4 @@ class Organizacao:
             "categorias": self.__categorias,
             "despesas": self.__despesas,
             "receitas": self.__receitas
-
         }
