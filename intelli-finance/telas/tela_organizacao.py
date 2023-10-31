@@ -315,16 +315,21 @@ class TelaOrganizacao(Tela):
     
     def adicionar_registro_financeiro(self, categorias_org, tipo):
         categorias = []
+        print(tipo, "tipooooo")
         for cat in categorias_org:
             print(f"Nome: {cat.nome}, Tipo: {cat.tipo}")
         
         if (tipo == "receita"):
             for cat in categorias_org:
-                categorias.append(cat.nome)
+                if (cat.tipo == "Receita"):
+                    categorias.append(cat.nome)
         
         else:
-             for cat in categorias_org:
-                categorias.append(cat.nome)
+             for cat in categorias_org :
+                  if (cat.tipo == "Despesa"): 
+                    categorias.append(cat.nome)
+
+        print(categorias, "categoriassss")
         
 
         def validar_data(data: str) -> bool:
