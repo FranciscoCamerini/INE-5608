@@ -268,9 +268,6 @@ class TelaOrganizacao(Tela):
         despesas = dados["despesas"]
         receitas = dados["receitas"]
         layout = []
-        print(dados, "dados")
-        print(despesas, "despesas")
-        print(receitas, "receitas")
         
         layout.append([self.texto("Despesas:")])
         if not despesas:
@@ -315,9 +312,6 @@ class TelaOrganizacao(Tela):
     
     def adicionar_registro_financeiro(self, categorias_org, tipo):
         categorias = []
-        print(tipo, "tipooooo")
-        for cat in categorias_org:
-            print(f"Nome: {cat.nome}, Tipo: {cat.tipo}")
         
         if (tipo == "receita"):
             for cat in categorias_org:
@@ -328,9 +322,6 @@ class TelaOrganizacao(Tela):
              for cat in categorias_org :
                   if (cat.tipo == "Despesa"): 
                     categorias.append(cat.nome)
-
-        print(categorias, "categoriassss")
-        
 
         def validar_data(data: str) -> bool:
             """Valida se a data está no formato dd/mm/aaaa."""
@@ -373,7 +364,6 @@ class TelaOrganizacao(Tela):
             # Verifica se existem dados faltando
             if any(not dado for dado in dados.values()):
                 self.popup("Favor preencher todos os campos!")
-                print(dados.values(), "values")
                 return self.adicionar_registro_financeiro(categorias_org, tipo)
             
             # Verifica a validade do valor
@@ -383,7 +373,6 @@ class TelaOrganizacao(Tela):
             
             # Verifica a validade da data
             if not validar_data(dados['data']):
-                print(dados, "dados")
                 self.popup("A data deve estar no formato dd/mm/aaaa.")
                 return self.adicionar_registro_financeiro(categorias_org, tipo)
             

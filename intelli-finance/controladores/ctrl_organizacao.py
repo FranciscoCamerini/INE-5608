@@ -142,7 +142,6 @@ class ControladorOrganizacao:
         categoriasDespesa = [cat for cat in categorias_org if cat.tipo == "Despesa"]
         categoriasReceita = [cat for cat in categorias_org if cat.tipo == "Receita"]
         
-        print(categorias_org, "categorias")
         if acao == "addDespesa":
            
             if not categoriasDespesa:  # Se a lista de categorias está vazia
