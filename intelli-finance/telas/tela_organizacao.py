@@ -1,5 +1,5 @@
 from telas.tela_base import Tela
-
+import re
 
 class TelaOrganizacao(Tela):
     def __init__(self):
@@ -22,7 +22,6 @@ class TelaOrganizacao(Tela):
         if acao == "criar":
             if any(not dado for dado in dados.values()):
                 self.popup("Favor preencher todos os campos!")
-
                 return self.criar_organizacao()
 
             return dados
@@ -34,6 +33,7 @@ class TelaOrganizacao(Tela):
             self.botao("Voltar", "cancelar", pad=((0, 20), (55, 0))),
             self.botao("Usuários", "usuarios", pad=((0, 0), (55, 0))),
             self.botao("Categorias", "categorias", pad=((20, 0), (55, 0))),
+            self.botao("Registros", "registros", pad=((20, 0), (55, 0))),
         ]
 
         if pode_alterar_dados:
@@ -266,3 +266,121 @@ class TelaOrganizacao(Tela):
             dados["status"] = "administrador"
 
         return acao, dados
+    
+    def listar_registros_financeiros(self, dados: dict):
+        despesas = dados["despesas"]
+        receitas = dados["receitas"]
+        layout = []
+        
+        layout.append([self.texto("Despesas:")])
+        if not despesas:
+           
+            layout.append([
+                [self.texto("Sua organização não possui nenhuma despesa.")]
+        ]) 
+        else:
+            for despesa in despesas:
+                sub_layout = [
+                    [[self.texto(f"{despesa.valor} -> {despesa.categoria}")]]
+                ]
+                layout.append(sub_layout)
+
+        layout.append([self.texto("Receitas:")])
+        if not receitas:
+            
+            layout.append([
+                [self.texto("Sua organização não possui nenhuma receita.")]
+        ]) 
+        else:
+            for receita in receitas:
+                sub_layout = [
+                    [[self.texto(f"{receita.valor} -> {receita.categoria}", size=(60, 1))]]
+                ]
+                layout.append(sub_layout)
+        
+        botoes = [
+            self.botao("Voltar", "voltar", pad=((0, 50), (55, 0))),
+             self.botao("Adicionar Despesa", "addDespesa", pad=((0, 0), (55, 0))),
+            self.botao("Adicionar Receita", "addReceita", pad=((0, 0), (55, 0)))
+           
+        ]
+
+        layout.append([botoes])
+
+        self.atualiza_tela(layout)
+        acao, _ = self.abrir()
+        self.fechar()
+
+        return acao
+    
+    def adicionar_registro_financeiro(self, categorias_org, tipo):
+        categorias = []
+        
+        if (tipo == "receita"):
+            for cat in categorias_org:
+                if (cat.tipo == "Receita"):
+                    categorias.append(cat.nome)
+        
+        else:
+             for cat in categorias_org :
+                  if (cat.tipo == "Despesa"): 
+                    categorias.append(cat.nome)
+
+        def validar_data(data: str) -> bool:
+            """Valida se a data está no formato dd/mm/aaaa."""
+            pattern = re.compile(r'^\d{2}/\d{2}/\d{4}$')
+            return bool(pattern.match(data))
+        
+        def validar_valor(valor: str) -> bool:
+            """Valida se o valor é um número."""
+            pattern = re.compile(r'^\d+(\.\d+)?$')
+            return bool(pattern.match(valor))
+       
+        self.atualiza_tela(
+            [
+                [self.texto("Tipo:")],
+                [self.radio("Receita", "RADIO1", default=(tipo == "receita"), key="Receita", disabled=True), self.radio("Despesa", "RADIO1", default=(tipo == "despesa"), key="Despesa", disabled=True)], 
+                [self.texto("Categoria:"), self.combo(categorias, valor_default=categorias[0], tamanho=(20, 1), chave="categoria", readonly=True)],
+                [self.texto("Valor:"), self.input("valor")],       
+                [self.texto("Descrição:")],
+                [self.multiline("", tamanho=(25, 3), chave="descricao")],
+                [self.texto('Data:'), self.input("data")],
+                [
+                    self.botao("Cancelar", "cancelar", pad=((0, 0), (35, 10))),
+                    self.botao("Confirmar", "confirmar", pad=((85, 0), (35, 10))),
+                ],
+            ]
+        )
+        acao, dados = self.abrir()
+        self.fechar()
+
+        # Determina o tipo e depois exclui as chaves indesejadas
+        if dados.get("Receita"):
+            dados['tipo'] = "Receita"
+        else:
+            dados['tipo'] = "Despesa"
+        del dados["Receita"]
+        del dados["Despesa"]
+
+        if acao == "confirmar":
+
+            # Verifica se existem dados faltando
+            if any(not dado for dado in dados.values()):
+                self.popup("Favor preencher todos os campos!")
+                return self.adicionar_registro_financeiro(categorias_org, tipo)
+            
+            # Verifica a validade do valor
+            if not validar_valor(dados['valor']):
+                self.popup("O valor deve conter somente números.")
+                return self.adicionar_registro_financeiro(categorias_org, tipo)
+            
+            # Verifica a validade da data
+            if not validar_data(dados['data']):
+                self.popup("A data deve estar no formato dd/mm/aaaa.")
+                return self.adicionar_registro_financeiro(categorias_org, tipo)
+            
+            
+        return acao, dados
+
+
+   

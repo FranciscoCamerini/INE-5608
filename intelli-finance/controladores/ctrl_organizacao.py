@@ -3,6 +3,7 @@ from bd.banco import Banco
 from modelos.organizacao import Organizacao
 from modelos.usuario import Usuario
 from modelos.categoria import Categoria
+from modelos.registro_financeiro import RegistroFinanceiro
 
 
 class ControladorOrganizacao:
@@ -147,5 +148,57 @@ class ControladorOrganizacao:
                 self.__tela.popup("Organização deletada com sucesso!")
             case "categorias":
                 return self.listar_categorias_org(usuario, org, cb)
+            case "registros":
+                return self.listar_registros_financeiros_org(usuario, org, cb)
 
         return cb(usuario)
+    
+    def listar_registros_financeiros_org(self, usuario: Usuario, org: Organizacao, cb=None):
+        acao = self.__tela.listar_registros_financeiros(
+            org.dados_organizacao()
+        )
+        categorias_org = org.dados_organizacao()["categorias"]
+        categoriasDespesa = [cat for cat in categorias_org if cat.tipo == "Despesa"]
+        categoriasReceita = [cat for cat in categorias_org if cat.tipo == "Receita"]
+        
+        if acao == "addDespesa":
+           
+            if not categoriasDespesa:  # Se a lista de categorias está vazia
+                self.__tela.popup("Não há categorias de despesa disponíveis.")
+                return self.listar_registros_financeiros_org(usuario, org, cb)
+            
+            acao, dados = self.__tela.adicionar_registro_financeiro(categorias_org, "despesa")
+
+            if acao == "confirmar":
+                
+                    org.adiciona_despesa(
+                        RegistroFinanceiro(dados['data'], dados['descricao'], -float(dados['valor']), dados['tipo'], dados['categoria'])
+                    )
+               
+                    
+                    self.__tela.popup("Despesa adicionada!")
+                    self.__banco.altera_organizacao(org.nome, org)
+
+            return self.listar_registros_financeiros_org(usuario, org, cb)
+        
+        elif acao == "addReceita":
+    
+            if not categoriasReceita:  # Se a lista de categorias está vazia
+                self.__tela.popup("Não há categorias de receita disponíveis.")
+                return self.listar_registros_financeiros_org(usuario, org, cb)
+            
+            acao, dados = self.__tela.adicionar_registro_financeiro(categorias_org, "receita")
+
+            if acao == "confirmar":
+                
+                    org.adiciona_receita(
+                        RegistroFinanceiro(dados['data'], dados['descricao'], float(dados['valor']), dados['tipo'], dados['categoria'])
+                    )
+               
+                    
+                    self.__tela.popup("Receita adicionada!")
+                    self.__banco.altera_organizacao(org.nome, org)
+
+            return self.listar_registros_financeiros_org(usuario, org, cb)
+
+        self.edita_organizacao(usuario, org.nome, cb)
