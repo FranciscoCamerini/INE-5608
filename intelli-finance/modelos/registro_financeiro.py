@@ -1,12 +1,23 @@
 class RegistroFinanceiro:
     def __init__(
-        self, data: str, descricao: str, valor: float, tipo: str, categoria: str
+        self,
+        data: str,
+        descricao: str,
+        valor: float,
+        tipo: str,
+        categoria: str,
+        status_autor: str,
     ) -> None:
         self.__data = data
         self.__descricao = descricao
         self.__valor = valor
         self.__tipo = tipo
         self.__categoria = categoria
+        self.__status_autor = status_autor
+
+    @property
+    def status_autor(self):
+        return self.__status_autor
 
     @property
     def data(self):

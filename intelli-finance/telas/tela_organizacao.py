@@ -274,7 +274,7 @@ class TelaOrganizacao(Tela):
 
         return acao, dados
 
-    def listar_registros_financeiros(self, dados: dict):
+    def listar_registros_financeiros(self, status_usuario: str, dados: dict):
         despesas = dados["despesas"]
         receitas = dados["receitas"]
         layout = []
@@ -291,16 +291,18 @@ class TelaOrganizacao(Tela):
         else:
             for i, despesa in enumerate(despesas):
                 sub_layout = [
-                    [
-                        [
-                            self.texto(
-                                f"{despesa.valor} -> {despesa.categoria}, Data: {despesa.data}",
-                                size=(120, 1),
-                            ),
-                            self.botao("Editar", f"editar_despesa:{i}"),
-                        ]
-                    ]
+                    self.texto(
+                        f"{despesa.valor} -> {despesa.categoria}, Data: {despesa.data}",
+                        size=(120, 1),
+                    )
                 ]
+                if (
+                    status_usuario == "proprietario"
+                    or despesa.status_autor == "funcionario_restrito"
+                    and status_usuario == "administrador"
+                ):
+                    sub_layout.append(self.botao("Editar", f"editar_despesa:{i}"))
+
                 layout.append(sub_layout)
 
         layout.append([self.titulo("Receitas:")])
@@ -314,15 +316,20 @@ class TelaOrganizacao(Tela):
             )
         else:
             for i, receita in enumerate(receitas):
-                layout.append(
-                    [
-                        self.texto(
-                            f"{receita.valor} -> {receita.categoria}, Data: {receita.data}",
-                            size=(120, 1),
-                        ),
-                        self.botao("Editar", f"editar_receita:{i}"),
-                    ]
-                )
+                sub_layout = [
+                    self.texto(
+                        f"{receita.valor} -> {receita.categoria}, Data: {receita.data}",
+                        size=(120, 1),
+                    )
+                ]
+                if (
+                    status_usuario == "proprietario"
+                    or receita.status_autor == "funcionario_restrito"
+                    and status_usuario == "administrador"
+                ):
+                    sub_layout.append(self.botao("Editar", f"editar_receita:{i}"))
+
+                layout.append(sub_layout)
 
         botoes = [
             self.botao("Voltar", "voltar", pad=((0, 50), (55, 0))),

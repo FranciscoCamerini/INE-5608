@@ -156,7 +156,9 @@ class ControladorOrganizacao:
         self, usuario: Usuario, org: Organizacao, cb=None
     ):
         dados_org = org.dados_organizacao()
-        acao = self.__tela.listar_registros_financeiros(dados_org)
+        acao = self.__tela.listar_registros_financeiros(
+            org.status_usuario(usuario), dados_org
+        )
         receitas_org = dados_org["receitas"]
         despesas_org = dados_org["despesas"]
 
@@ -181,6 +183,7 @@ class ControladorOrganizacao:
                         abs(float(dados["valor"])) * -1,
                         dados["tipo"],
                         dados["categoria"],
+                        org.status_usuario(usuario),
                     )
                 )
 
@@ -206,6 +209,7 @@ class ControladorOrganizacao:
                         abs(float(dados["valor"])),
                         dados["tipo"],
                         dados["categoria"],
+                        org.status_usuario(usuario),
                     )
                 )
 
