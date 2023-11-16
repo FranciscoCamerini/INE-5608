@@ -122,9 +122,11 @@ class ControladorOrganizacao:
         self.edita_organizacao(usuario, org.nome, cb)
 
     def edita_organizacao(self, usuario: Usuario, nome_org: str, cb=None):
-        org = self.__banco.pega_organizacao(nome_org)
+        org: Organizacao = self.__banco.pega_organizacao(nome_org)
+
+        notificacoes = org.registros_a_notificar()
         acao, dados = self.__tela.editar_organizacao(
-            org.dados_organizacao(), org.status_usuario(usuario)
+            org.dados_organizacao(), org.status_usuario(usuario), notificacoes
         )
 
         match acao:
@@ -149,6 +151,8 @@ class ControladorOrganizacao:
                 return self.listar_categorias_org(usuario, org, cb)
             case "registros":
                 return self.listar_registros_financeiros_org(usuario, org, cb)
+            case "notificacoes":
+                return self.listar_notificacoes(usuario, org, notificacoes, cb)
 
         return cb(usuario)
 
@@ -269,5 +273,10 @@ class ControladorOrganizacao:
                 self.__tela.popup("Registro removido com sucesso!")
 
             return self.listar_registros_financeiros_org(usuario, org, cb)
+
+        self.edita_organizacao(usuario, org.nome, cb)
+
+    def listar_notificacoes(self, usuario, org, notificacoes, cb):
+        self.__tela.listar_notificacoes(notificacoes)
 
         self.edita_organizacao(usuario, org.nome, cb)

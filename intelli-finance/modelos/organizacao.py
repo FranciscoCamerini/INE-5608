@@ -1,3 +1,5 @@
+from datetime import datetime, timedelta
+
 from modelos.usuario import Usuario
 from modelos.categoria import Categoria
 from modelos.registro_financeiro import RegistroFinanceiro
@@ -113,3 +115,30 @@ class Organizacao:
             "despesas": self.__despesas,
             "receitas": self.__receitas,
         }
+
+    def registros_a_notificar(self):
+        notificacoes = {"despesas": [], "receitas": []}
+
+        hoje = datetime.now()
+        for receita in self.receitas:
+            try:
+                obj_data = datetime.strptime(receita.data, "%d/%m/%Y")
+                if obj_data > hoje and obj_data - hoje <= timedelta(days=7):
+                    notificacoes["receitas"].append(receita)
+            except Exception:
+                pass
+
+        for despesa in self.despesas:
+            try:
+                obj_data = datetime.strptime(despesa.data, "%d/%m/%Y")
+                if obj_data > hoje and obj_data - hoje <= timedelta(days=7):
+                    notificacoes["despesas"].append(despesa)
+            except Exception:
+                pass
+
+        if not (len(notificacoes["despesas"]) or len(notificacoes["receitas"])):
+            return {}
+
+        notificacoes["receitas"] = []
+
+        return notificacoes

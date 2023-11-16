@@ -27,7 +27,7 @@ class TelaOrganizacao(Tela):
 
             return dados
 
-    def editar_organizacao(self, dados, status_usuario):
+    def editar_organizacao(self, dados, status_usuario, notificacoes):
         pode_alterar_dados = status_usuario == "proprietario"
 
         botoes = [
@@ -36,6 +36,20 @@ class TelaOrganizacao(Tela):
             self.botao("Categorias", "categorias", pad=((20, 0), (55, 0))),
             self.botao("Registros", "registros", pad=((20, 0), (55, 0))),
         ]
+
+        if status_usuario in ["proprietario", "administrador"]:
+            botoes.append(
+                self.botao(
+                    "Notificações"
+                    + (
+                        f" ({len(notificacoes['despesas']) + len(notificacoes['receitas'])})"
+                        if notificacoes
+                        else ""
+                    ),
+                    "notificacoes",
+                    pad=((20, 0), (55, 0)),
+                )
+            )
 
         if pode_alterar_dados:
             botoes.extend(
@@ -462,3 +476,40 @@ class TelaOrganizacao(Tela):
                 return self.adicionar_registro_financeiro(categorias_org, tipo)
 
         return acao, dados
+
+    def listar_notificacoes(self, notificacoes):
+        layout = []
+
+        if notificacoes.get("despesas"):
+            layout.append([self.titulo("Despesas Dos Próximos 7 Dias")])
+
+            for registro in notificacoes["despesas"]:
+                layout.append(
+                    [
+                        self.texto(
+                            f"{registro.data} -> Categoria: {registro.categoria}. Valor: {registro.valor}",
+                            size=(100, 1),
+                        )
+                    ]
+                )
+
+        if notificacoes.get("receitas"):
+            layout.append([self.titulo("Receitas Dos Próximos 7 Dias")])
+
+            for registro in notificacoes["receitas"]:
+                layout.append(
+                    [
+                        self.texto(
+                            f"{registro.data} -> Categoria: {registro.categoria}. Valor: {registro.valor}",
+                            size=(100, 1),
+                        )
+                    ]
+                )
+
+        if not (notificacoes.get("despesas") or notificacoes.get("receitas")):
+            layout.append(self.titulo("Não há notificações"))
+
+        self.atualiza_tela([layout, [self.botao("Voltar", "voltar")]])
+
+        self.abrir()
+        self.fechar()
