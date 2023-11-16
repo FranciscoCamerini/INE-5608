@@ -1,6 +1,7 @@
 from telas.tela_base import Tela
 import re
 
+
 class TelaOrganizacao(Tela):
     def __init__(self):
         super().__init__()
@@ -37,15 +38,16 @@ class TelaOrganizacao(Tela):
         ]
 
         if pode_alterar_dados:
-            botoes.append(self.botao("Salvar", "salvar", pad=((55, 0), (55, 0))))
-            botoes.insert(
-                3,
-                self.botao(
-                    "Deletar Organização",
-                    "deletar",
-                    pad=((65, 25), (55, 0)),
-                    cor="red",
-                ),
+            botoes.extend(
+                [
+                    self.botao(
+                        "Deletar Organização",
+                        "deletar",
+                        pad=((65, 25), (55, 0)),
+                        cor="red",
+                    ),
+                    self.botao("Salvar", "salvar", pad=((55, 0), (55, 0))),
+                ]
             )
 
         self.atualiza_tela(
@@ -87,7 +89,12 @@ class TelaOrganizacao(Tela):
         if not categorias:
             extra["size"] = (400, 200)
             layout.append(
-                [self.texto("Sua organização não possui categorias de transação.")]
+                [
+                    self.texto(
+                        "Sua organização não possui categorias de transação.",
+                        size=(140, 1),
+                    )
+                ]
             )
         else:
             layout.append([self.titulo("Categorias de transação")])
@@ -266,43 +273,61 @@ class TelaOrganizacao(Tela):
             dados["status"] = "administrador"
 
         return acao, dados
-    
+
     def listar_registros_financeiros(self, dados: dict):
         despesas = dados["despesas"]
         receitas = dados["receitas"]
         layout = []
-        
-        layout.append([self.texto("Despesas:")])
+
+        layout.append([self.titulo("Despesas:")])
         if not despesas:
-           
-            layout.append([
-                [self.texto("Sua organização não possui nenhuma despesa.")]
-        ]) 
+            layout.append(
+                [
+                    self.texto(
+                        "Sua organização não possui nenhuma despesa.", size=(100, 1)
+                    )
+                ]
+            )
         else:
-            for despesa in despesas:
+            for i, despesa in enumerate(despesas):
                 sub_layout = [
-                    [[self.texto(f"{despesa.valor} -> {despesa.categoria}")]]
+                    [
+                        [
+                            self.texto(
+                                f"{despesa.valor} -> {despesa.categoria}, Data: {despesa.data}",
+                                size=(120, 1),
+                            ),
+                            self.botao("Editar", f"editar_despesa:{i}"),
+                        ]
+                    ]
                 ]
                 layout.append(sub_layout)
 
-        layout.append([self.texto("Receitas:")])
+        layout.append([self.titulo("Receitas:")])
         if not receitas:
-            
-            layout.append([
-                [self.texto("Sua organização não possui nenhuma receita.")]
-        ]) 
-        else:
-            for receita in receitas:
-                sub_layout = [
-                    [[self.texto(f"{receita.valor} -> {receita.categoria}", size=(60, 1))]]
+            layout.append(
+                [
+                    self.texto(
+                        "Sua organização não possui nenhuma receita.", size=(100, 1)
+                    )
                 ]
-                layout.append(sub_layout)
-        
+            )
+        else:
+            for i, receita in enumerate(receitas):
+                layout.append(
+                    [
+                        self.texto(
+                            f"{receita.valor} -> {receita.categoria}, Data: {receita.data}",
+                            size=(120, 1),
+                        ),
+                        self.botao("Editar", f"editar_receita:{i}"),
+                    ]
+                )
+
         botoes = [
             self.botao("Voltar", "voltar", pad=((0, 50), (55, 0))),
-             self.botao("Adicionar Despesa", "addDespesa", pad=((0, 0), (55, 0))),
-            self.botao("Adicionar Receita", "addReceita", pad=((0, 0), (55, 0)))
-           
+            self.botao("Adicionar Despesa", "addDespesa", pad=((0, 0), (55, 0))),
+            self.botao("Adicionar Receita", "addReceita", pad=((0, 0), (55, 0))),
         ]
 
         layout.append([botoes])
@@ -312,43 +337,94 @@ class TelaOrganizacao(Tela):
         self.fechar()
 
         return acao
-    
-    def adicionar_registro_financeiro(self, categorias_org, tipo):
+
+    def adicionar_registro_financeiro(self, categorias_org, tipo, dados_input={}):
         categorias = []
-        
-        if (tipo == "receita"):
+
+        if tipo == "receita":
             for cat in categorias_org:
-                if (cat.tipo == "Receita"):
+                if cat.tipo == "Receita":
                     categorias.append(cat.nome)
-        
+
         else:
-             for cat in categorias_org :
-                  if (cat.tipo == "Despesa"): 
+            for cat in categorias_org:
+                if cat.tipo == "Despesa":
                     categorias.append(cat.nome)
 
         def validar_data(data: str) -> bool:
             """Valida se a data está no formato dd/mm/aaaa."""
-            pattern = re.compile(r'^\d{2}/\d{2}/\d{4}$')
+            pattern = re.compile(r"^\d{2}/\d{2}/\d{4}$")
             return bool(pattern.match(data))
-        
+
         def validar_valor(valor: str) -> bool:
             """Valida se o valor é um número."""
-            pattern = re.compile(r'^\d+(\.\d+)?$')
-            return bool(pattern.match(valor))
-       
+            try:
+                float(valor)
+            except Exception:
+                return False
+            else:
+                return True
+
+        botoes = [
+            self.botao("Cancelar", "cancelar", pad=((0, 0), (35, 10))),
+            self.botao("Confirmar", "confirmar", pad=((85, 0), (35, 10))),
+        ]
+        if dados_input:
+            botoes.insert(
+                1,
+                self.botao("Deletar", "deletar", pad=((85, 0), (35, 10)), cor="red"),
+            )
+
         self.atualiza_tela(
             [
                 [self.texto("Tipo:")],
-                [self.radio("Receita", "RADIO1", default=(tipo == "receita"), key="Receita", disabled=True), self.radio("Despesa", "RADIO1", default=(tipo == "despesa"), key="Despesa", disabled=True)], 
-                [self.texto("Categoria:"), self.combo(categorias, valor_default=categorias[0], tamanho=(20, 1), chave="categoria", readonly=True)],
-                [self.texto("Valor:"), self.input("valor")],       
-                [self.texto("Descrição:")],
-                [self.multiline("", tamanho=(25, 3), chave="descricao")],
-                [self.texto('Data:'), self.input("data")],
                 [
-                    self.botao("Cancelar", "cancelar", pad=((0, 0), (35, 10))),
-                    self.botao("Confirmar", "confirmar", pad=((85, 0), (35, 10))),
+                    self.radio(
+                        "Receita",
+                        "RADIO1",
+                        default=(tipo == "receita"),
+                        key="Receita",
+                        disabled=True,
+                    ),
+                    self.radio(
+                        "Despesa",
+                        "RADIO1",
+                        default=(tipo == "despesa"),
+                        key="Despesa",
+                        disabled=True,
+                    ),
                 ],
+                [
+                    self.texto("Categoria:"),
+                    self.combo(
+                        categorias,
+                        valor_default=categorias[0]
+                        if not dados_input
+                        else dados_input["categoria"],
+                        tamanho=(20, 1),
+                        chave="categoria",
+                        readonly=True,
+                    ),
+                ],
+                [
+                    self.texto("Valor:"),
+                    self.input(
+                        "valor", valor="" if not dados_input else dados_input["valor"]
+                    ),
+                ],
+                [self.texto("Descrição:")],
+                [
+                    self.multiline(
+                        "" if not dados_input else dados_input["descricao"],
+                        tamanho=(25, 3),
+                        chave="descricao",
+                    )
+                ],
+                [
+                    self.texto("Data:"),
+                    self.input("data", "" if not dados_input else dados_input["data"]),
+                ],
+                botoes,
             ]
         )
         acao, dados = self.abrir()
@@ -356,31 +432,26 @@ class TelaOrganizacao(Tela):
 
         # Determina o tipo e depois exclui as chaves indesejadas
         if dados.get("Receita"):
-            dados['tipo'] = "Receita"
+            dados["tipo"] = "Receita"
         else:
-            dados['tipo'] = "Despesa"
+            dados["tipo"] = "Despesa"
         del dados["Receita"]
         del dados["Despesa"]
 
         if acao == "confirmar":
-
             # Verifica se existem dados faltando
             if any(not dado for dado in dados.values()):
                 self.popup("Favor preencher todos os campos!")
                 return self.adicionar_registro_financeiro(categorias_org, tipo)
-            
+
             # Verifica a validade do valor
-            if not validar_valor(dados['valor']):
+            if not validar_valor(dados["valor"]):
                 self.popup("O valor deve conter somente números.")
                 return self.adicionar_registro_financeiro(categorias_org, tipo)
-            
+
             # Verifica a validade da data
-            if not validar_data(dados['data']):
+            if not validar_data(dados["data"]):
                 self.popup("A data deve estar no formato dd/mm/aaaa.")
                 return self.adicionar_registro_financeiro(categorias_org, tipo)
-            
-            
+
         return acao, dados
-
-
-   

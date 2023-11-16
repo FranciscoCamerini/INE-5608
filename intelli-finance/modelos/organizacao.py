@@ -33,16 +33,22 @@ class Organizacao:
     @property
     def proprietario(self):
         return self.__proprietario
-    
+
     @property
     def despesas(self):
         return self.__despesas
-    
+
+    @despesas.setter
+    def despesas(self, despesas):
+        self.__despesas = despesas
+
     @property
     def receitas(self):
         return self.__receitas
-    
-    
+
+    @receitas.setter
+    def receitas(self, receitas):
+        self.__receitas = receitas
 
     def status_usuario(self, usuario):
         if self.proprietario.email == usuario.email:
@@ -105,5 +111,5 @@ class Organizacao:
             "funcionarios_restritos": self.__funcionarios_restritos,
             "categorias": self.__categorias,
             "despesas": self.__despesas,
-            "receitas": self.__receitas
+            "receitas": self.__receitas,
         }
