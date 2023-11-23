@@ -1,10 +1,27 @@
-from telas.tela_base import Tela
 import re
+from datetime import datetime
+
+from telas.tela_base import Tela
 
 
 class TelaOrganizacao(Tela):
     def __init__(self):
         super().__init__()
+
+    def valida_data(self, data_str):
+        obj_data = None
+
+        try:
+            obj_data = datetime.strptime(data_str, "%d/%m/%Y")
+        except Exception:
+            pass
+
+        try:
+            obj_data = datetime.strptime(data_str, "%-d/%m/%Y")
+        except Exception:
+            pass
+
+        return obj_data
 
     def criar_organizacao(self) -> (dict, None):
         self.atualiza_tela(
@@ -50,6 +67,7 @@ class TelaOrganizacao(Tela):
                     pad=((20, 0), (55, 0)),
                 )
             )
+            botoes.append(self.botao("Relatório", "relatorio", pad=((20, 0), (55, 0))))
 
         if pode_alterar_dados:
             botoes.extend(
@@ -169,12 +187,16 @@ class TelaOrganizacao(Tela):
         return acao, dados
 
     def listar_usuarios(self, dados, status_usuario):
+        proprietario = dados["proprietario"]
         func_restritos = dados["funcionarios_restritos"]
         administradores = dados["administradores"]
 
-        proprietario = status_usuario == "proprietario"
+        eh_proprietario = status_usuario == "proprietario"
 
-        layout = []
+        layout = [
+            [self.titulo("Proprietário:")],
+            [[self.texto(proprietario.nome)], [self.texto(proprietario.email)]],
+        ]
         extra = {}
         if not (func_restritos or administradores):
             extra["size"] = (400, 200)
@@ -188,7 +210,7 @@ class TelaOrganizacao(Tela):
                 sub_layout = [
                     [[self.texto(usuario.nome)], [self.texto(usuario.email)]],
                 ]
-                if proprietario:
+                if eh_proprietario:
                     sub_layout.append(
                         self.botao("Editar", usuario.email, pad=((0, 0), (0, 40)))
                     )
@@ -200,7 +222,7 @@ class TelaOrganizacao(Tela):
                 sub_layout = [
                     [[self.texto(usuario.nome)], [self.texto(usuario.email)]],
                 ]
-                if proprietario:
+                if eh_proprietario:
                     sub_layout.append(
                         self.botao("Editar", usuario.email, pad=((0, 0), (0, 40)))
                     )
@@ -209,7 +231,7 @@ class TelaOrganizacao(Tela):
         botoes = [
             self.botao("Voltar", "voltar", pad=((0, 20), (55, 0))),
         ]
-        if proprietario:
+        if eh_proprietario:
             botoes.append(self.botao("Adicionar Usuário", "add", pad=((0, 0), (55, 0))))
 
         layout.append([botoes])
@@ -513,3 +535,125 @@ class TelaOrganizacao(Tela):
 
         self.abrir()
         self.fechar()
+
+    def pega_dados_relatorio(
+        self, relatorios, categorias_receita, categorias_despesa, listar=True
+    ):
+        acao = ""
+        if listar:
+            layout_relatorios = []
+            for relatorio in relatorios:
+                layout_relatorios.append(
+                    [
+                        self.texto(relatorio.nome),
+                        self.botao("Exportar", f"exportar-{relatorio.nome}"),
+                        self.botao(
+                            "Detalhes",
+                            f"detalhes-{relatorio.nome}",
+                            pad=((20, 0), (0, 0)),
+                        ),
+                    ]
+                )
+
+            self.atualiza_tela(
+                [
+                    [self.titulo("Relatórios")],
+                    layout_relatorios,
+                    [
+                        self.botao("Voltar", "voltar", pad=((0, 0), (60, 0))),
+                        self.botao("Novo Relatório", "novo", pad=((100, 0), (60, 0))),
+                    ],
+                ]
+            )
+
+            acao, _ = self.abrir()
+            self.fechar()
+
+        if not listar or acao == "novo":
+            self.atualiza_tela(
+                [
+                    [self.texto("Nome Relatório: "), self.input("nome")],
+                    [self.texto("Data Início: "), self.input("data_inicio")],
+                    [self.texto("Data Fim: "), self.input("data_fim")],
+                    [self.texto("Formato datas: DD/MM/AAAA", font_size=12)],
+                    [self.texto("Agrupar Registros por:")],
+                    [
+                        self.combo(
+                            ["Dia", "Semana", "Mês", "3 Meses", "6 Meses", "Ano"],
+                            "Semana",
+                            chave="agrupar",
+                            readonly=False,
+                        )
+                    ],
+                    [self.texto("Categorias Incluídas (Receitas)")],
+                    [self.lista(categorias_receita, chave="categorias_receita")],
+                    [self.texto("Categorias Incluídas (Despesas)", size=(28, 1))],
+                    [self.lista(categorias_despesa, chave="categorias_despesa")],
+                    [self.texto("Confirme sua senha: "), self.input("senha")],
+                    [
+                        self.botao("Cancelar", "cancelar"),
+                        self.botao("Gerar", "gerar", pad=((100, 0), (0, 0))),
+                    ],
+                ]
+            )
+
+        acao, dados = self.abrir()
+        self.fechar()
+
+        if acao == "gerar":
+            if not dados["nome"]:
+                self.popup("O campo 'nome' é obrigatório!")
+                return self.pega_dados_relatorio(
+                    relatorios, categorias_receita, categorias_despesa, listar=False
+                )
+
+            data_inicio = self.valida_data(dados["data_inicio"])
+            data_fim = self.valida_data(dados["data_fim"])
+
+            if not data_inicio:
+                self.popup("Data de início inválida! Formato esperado: DD/MM/AAAA")
+                return self.pega_dados_relatorio(
+                    relatorios, categorias_receita, categorias_despesa, listar=False
+                )
+
+            if not data_fim:
+                self.popup("Data de fim inválida! Formato esperado: DD/MM/AAAA")
+                return self.pega_dados_relatorio(
+                    relatorios, categorias_receita, categorias_despesa, listar=False
+                )
+
+            if not data_fim > data_inicio:
+                self.popup("A data final deve ser maior do que a data inicial!")
+                return self.pega_dados_relatorio(
+                    relatorios, categorias_receita, categorias_despesa, listar=False
+                )
+
+            if dados["agrupar"] not in [
+                "Dia",
+                "Semana",
+                "Mês",
+                "3 Meses",
+                "6 Meses",
+                "Ano",
+            ]:
+                self.popup("Agrupamento temporal de despesas inválido!")
+                return self.pega_dados_relatorio(
+                    relatorios, categorias_receita, categorias_despesa, listar=False
+                )
+
+            if not dados["senha"]:
+                self.popup("O campo 'senha' é obrigatório")
+                return self.pega_dados_relatorio(
+                    relatorios, categorias_receita, categorias_despesa, listar=False
+                )
+
+            if acao == "cancelar":
+                return self.pega_dados_relatorio(
+                    relatorios, categorias_receita, categorias_despesa, listar=False
+                )
+        elif acao == "cancelar":
+            return self.pega_dados_relatorio(
+                relatorios, categorias_receita, categorias_despesa
+            )
+
+        return acao, dados

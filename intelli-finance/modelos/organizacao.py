@@ -3,6 +3,7 @@ from datetime import datetime, timedelta
 from modelos.usuario import Usuario
 from modelos.categoria import Categoria
 from modelos.registro_financeiro import RegistroFinanceiro
+from modelos.relatorio import Relatorio
 
 
 class Organizacao:
@@ -15,6 +16,7 @@ class Organizacao:
         self.__categorias: list[Categoria] = []
         self.__despesas: list[RegistroFinanceiro] = []
         self.__receitas: list[RegistroFinanceiro] = []
+        self.__relatorios: list[Relatorio] = []
 
     @property
     def nome(self):
@@ -51,6 +53,14 @@ class Organizacao:
     @receitas.setter
     def receitas(self, receitas):
         self.__receitas = receitas
+
+    @property
+    def categorias(self):
+        return self.__categorias
+
+    @property
+    def relatorios(self):
+        return self.__relatorios
 
     def status_usuario(self, usuario):
         if self.proprietario.email == usuario.email:

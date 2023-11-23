@@ -13,11 +13,31 @@ class Tela(ABC):
     def popup(self, msg):
         sg.Popup("", msg, font=DEFAULT_FONT)
 
-    def radio(self, text: str, group_id: str ="RADIO1", default: bool =False, key=None, disabled: bool = False):
-        return sg.Radio(text, group_id, default=default, key=key, disabled=disabled )
-    
-    def combo(self, valores: list, valor_default: str, tamanho: tuple[int], chave: str, readonly: bool = True):
-        return sg.Combo(valores, default_value=valor_default, size=tamanho, key=chave, readonly=readonly)
+    def radio(
+        self,
+        text: str,
+        group_id: str = "RADIO1",
+        default: bool = False,
+        key=None,
+        disabled: bool = False,
+    ):
+        return sg.Radio(text, group_id, default=default, key=key, disabled=disabled)
+
+    def combo(
+        self,
+        valores: list,
+        valor_default: str,
+        chave: str,
+        readonly: bool = True,
+        tamanho: tuple[int] = (None, None),
+    ):
+        return sg.Combo(
+            valores,
+            default_value=valor_default,
+            size=tamanho,
+            key=chave,
+            readonly=readonly,
+        )
 
     def multiline(self, valor: str, tamanho: tuple[int], chave: str):
         return sg.Multiline(valor, size=tamanho, key=chave)
@@ -53,8 +73,8 @@ class Tela(ABC):
             texto, justification=alinhamento, size=(40, 3), font=("arial", 24, "bold")
         )
 
-    def texto(self, texto: str, estilo: str = "normal", size=(25, 1)):
-        return sg.Text(texto, size=size, font=("arial", 16, estilo))
+    def texto(self, texto: str, estilo: str = "normal", size=(25, 1), font_size=16):
+        return sg.Text(texto, size=size, font=("arial", font_size, estilo))
 
     def botao(self, texto_botao: str, chave: str, pad: int = 0, cor: str = "blue"):
         return sg.Button(
@@ -69,6 +89,15 @@ class Tela(ABC):
 
     def dropdown(self, escolhas: [str], default=None):
         return sg.Combo(escolhas, default, font=DEFAULT_FONT)
+
+    def lista(self, escolhas: [str], chave: str, defaults: [str] = []):
+        return sg.Listbox(
+            escolhas,
+            default_values=defaults,
+            key=chave,
+            select_mode="extended",
+            size=(30, 6),
+        )
 
     def atualiza_tela(self, layout: dict, extra: dict = None):
         extra = {} if not extra else dict(extra)

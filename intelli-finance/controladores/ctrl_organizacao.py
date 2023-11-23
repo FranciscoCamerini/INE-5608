@@ -3,6 +3,7 @@ from bd.banco import Banco
 from modelos.organizacao import Organizacao
 from modelos.usuario import Usuario
 from modelos.categoria import Categoria
+from modelos.relatorio import Relatorio
 from modelos.registro_financeiro import RegistroFinanceiro
 
 
@@ -153,6 +154,8 @@ class ControladorOrganizacao:
                 return self.listar_registros_financeiros_org(usuario, org, cb)
             case "notificacoes":
                 return self.listar_notificacoes(usuario, org, notificacoes, cb)
+            case "relatorio":
+                return self.listar_relatorios(usuario, org, cb)
 
         return cb(usuario)
 
@@ -278,5 +281,34 @@ class ControladorOrganizacao:
 
     def listar_notificacoes(self, usuario, org, notificacoes, cb):
         self.__tela.listar_notificacoes(notificacoes)
+
+        self.edita_organizacao(usuario, org.nome, cb)
+
+    def listar_relatorios(self, usuario: Usuario, org: Organizacao, cb, listar=True):
+        categorias_despesa = [c.nome for c in org.categorias if c.tipo == "Despesa"]
+        categorias_receita = [c.nome for c in org.categorias if c.tipo == "Receita"]
+
+        acao, dados = self.__tela.pega_dados_relatorio(
+            org.relatorios, categorias_receita, categorias_despesa, listar=listar
+        )
+
+        if acao == "gerar":
+            if not usuario.valida_senha(dados["senha"]):
+                self.__tela.popup("Senha inválida!")
+                return self.listar_relatorios(usuario, org, cb, listar=False)
+
+            if dados["nome"] in [relatorio.nome for relatorio in org.relatorios]:
+                self.__tela.popup(
+                    "Já há um relatório com este nome na sua organização!"
+                )
+                return self.listar_relatorios(usuario, org, cb, listar=False)
+
+            dados.pop("senha", None)
+            relatorio = Relatorio(**dados, autor=usuario)
+            org.relatorios.append(relatorio)
+            self.__banco.salva_organizacao(org)
+            self.__tela.popup("Relatório criado com sucesso!")
+
+            return self.listar_relatorios(usuario, org, cb)
 
         self.edita_organizacao(usuario, org.nome, cb)
