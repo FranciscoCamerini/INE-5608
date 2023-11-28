@@ -575,20 +575,11 @@ class TelaOrganizacao(Tela):
                     [self.texto("Data Início: "), self.input("data_inicio")],
                     [self.texto("Data Fim: "), self.input("data_fim")],
                     [self.texto("Formato datas: DD/MM/AAAA", font_size=12)],
-                    [self.texto("Agrupar Registros por:")],
-                    [
-                        self.combo(
-                            ["Dia", "Semana", "Mês", "3 Meses", "6 Meses", "Ano"],
-                            "Semana",
-                            chave="agrupar",
-                            readonly=False,
-                        )
-                    ],
                     [self.texto("Categorias Incluídas (Receitas)")],
                     [self.lista(categorias_receita, chave="categorias_receita")],
                     [self.texto("Categorias Incluídas (Despesas)", size=(28, 1))],
                     [self.lista(categorias_despesa, chave="categorias_despesa")],
-                    [self.texto("Confirme sua senha: "), self.input("senha")],
+                    [self.texto("Confirme sua senha: "), self.input_senha("senha")],
                     [
                         self.botao("Cancelar", "cancelar"),
                         self.botao("Gerar", "gerar", pad=((100, 0), (0, 0))),
@@ -606,8 +597,8 @@ class TelaOrganizacao(Tela):
                     relatorios, categorias_receita, categorias_despesa, listar=False
                 )
 
-            data_inicio = self.valida_data(dados["data_inicio"])
-            data_fim = self.valida_data(dados["data_fim"])
+            data_inicio = valida_data(dados["data_inicio"])
+            data_fim = valida_data(dados["data_fim"])
 
             if not data_inicio:
                 self.popup("Data de início inválida! Formato esperado: DD/MM/AAAA")
@@ -623,19 +614,6 @@ class TelaOrganizacao(Tela):
 
             if not data_fim > data_inicio:
                 self.popup("A data final deve ser maior do que a data inicial!")
-                return self.pega_dados_relatorio(
-                    relatorios, categorias_receita, categorias_despesa, listar=False
-                )
-
-            if dados["agrupar"] not in [
-                "Dia",
-                "Semana",
-                "Mês",
-                "3 Meses",
-                "6 Meses",
-                "Ano",
-            ]:
-                self.popup("Agrupamento temporal de despesas inválido!")
                 return self.pega_dados_relatorio(
                     relatorios, categorias_receita, categorias_despesa, listar=False
                 )
@@ -666,10 +644,6 @@ class TelaOrganizacao(Tela):
                 self.texto(relatorio.data_inicio),
             ],
             [self.texto("Data Fim: ", estilo="bold"), self.texto(relatorio.data_fim)],
-            [
-                self.texto("Agrupar Registros A Cada: ", estilo="bold"),
-                self.texto(relatorio.agrupar),
-            ],
         ]
 
         if relatorio.categorias_receita:

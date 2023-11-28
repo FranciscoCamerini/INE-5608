@@ -15,7 +15,6 @@ class Relatorio:
         nome: str,
         data_inicio: str,
         data_fim: str,
-        agrupar: str,
         categorias_receita: [str],
         categorias_despesa: [str],
         autor: Usuario,
@@ -24,7 +23,6 @@ class Relatorio:
         self.__nome = nome
         self.__data_inicio = data_inicio
         self.__data_fim = data_fim
-        self.__agrupar = agrupar
         self.__categorias_receita = categorias_receita
         self.__categorias_despesa = categorias_despesa
         self.__autor = autor
@@ -44,10 +42,6 @@ class Relatorio:
     @property
     def data_fim(self):
         return self.__data_fim
-
-    @property
-    def agrupar(self):
-        return self.__agrupar
 
     @property
     def categorias_receita(self):
