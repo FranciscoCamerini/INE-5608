@@ -167,3 +167,21 @@ class Organizacao:
         notificacoes["receitas"] = []
 
         return notificacoes
+
+    def receitas_por_categoria(self, categorias: list):
+        registros = []
+
+        for receita in self.receitas:
+            if receita.categoria in categorias:
+                registros.append(receita)
+
+        return registros
+
+    def despesas_por_categoria(self, categorias: list):
+        registros = []
+
+        for despesa in self.despesas:
+            if despesa.categoria in categorias:
+                registros.append(despesa)
+
+        return registros

@@ -1,27 +1,27 @@
-import re
 from datetime import datetime
 
 from telas.tela_base import Tela
 
 
+def valida_data(data_str):
+    obj_data = None
+
+    try:
+        obj_data = datetime.strptime(data_str, "%d/%m/%Y")
+    except Exception:
+        pass
+
+    try:
+        obj_data = datetime.strptime(data_str, "%-d/%m/%Y")
+    except Exception:
+        pass
+
+    return obj_data
+
+
 class TelaOrganizacao(Tela):
     def __init__(self):
         super().__init__()
-
-    def valida_data(self, data_str):
-        obj_data = None
-
-        try:
-            obj_data = datetime.strptime(data_str, "%d/%m/%Y")
-        except Exception:
-            pass
-
-        try:
-            obj_data = datetime.strptime(data_str, "%-d/%m/%Y")
-        except Exception:
-            pass
-
-        return obj_data
 
     def criar_organizacao(self) -> (dict, None):
         self.atualiza_tela(
@@ -48,10 +48,14 @@ class TelaOrganizacao(Tela):
         pode_alterar_dados = status_usuario == "proprietario"
 
         botoes = [
-            self.botao("Voltar", "cancelar", pad=((0, 20), (55, 0))),
-            self.botao("Usuários", "usuarios", pad=((0, 0), (55, 0))),
-            self.botao("Categorias", "categorias", pad=((20, 0), (55, 0))),
-            self.botao("Registros", "registros", pad=((20, 0), (55, 0))),
+            [
+                self.botao("Voltar", "cancelar", pad=((0, 20), (55, 0))),
+                self.botao("Usuários", "usuarios", pad=((0, 0), (55, 0))),
+            ],
+            [
+                self.botao("Categorias", "categorias", pad=((0, 20), (55, 0))),
+                self.botao("Registros", "registros", pad=((0, 0), (55, 0))),
+            ],
         ]
 
         if status_usuario in ["proprietario", "administrador"]:
@@ -64,7 +68,7 @@ class TelaOrganizacao(Tela):
                         else ""
                     ),
                     "notificacoes",
-                    pad=((20, 0), (55, 0)),
+                    pad=((0, 0), (55, 0)),
                 )
             )
             botoes.append(self.botao("Relatório", "relatorio", pad=((20, 0), (55, 0))))
@@ -394,11 +398,6 @@ class TelaOrganizacao(Tela):
                 if cat.tipo == "Despesa":
                     categorias.append(cat.nome)
 
-        def validar_data(data: str) -> bool:
-            """Valida se a data está no formato dd/mm/aaaa."""
-            pattern = re.compile(r"^\d{2}/\d{2}/\d{4}$")
-            return bool(pattern.match(data))
-
         def validar_valor(valor: str) -> bool:
             """Valida se o valor é um número."""
             try:
@@ -493,7 +492,7 @@ class TelaOrganizacao(Tela):
                 return self.adicionar_registro_financeiro(categorias_org, tipo)
 
             # Verifica a validade da data
-            if not validar_data(dados["data"]):
+            if not valida_data(dados["data"]):
                 self.popup("A data deve estar no formato dd/mm/aaaa.")
                 return self.adicionar_registro_financeiro(categorias_org, tipo)
 

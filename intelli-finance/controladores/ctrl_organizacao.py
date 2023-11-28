@@ -304,7 +304,7 @@ class ControladorOrganizacao:
                 return self.listar_relatorios(usuario, org, cb, listar=False)
 
             dados.pop("senha", None)
-            relatorio = Relatorio(**dados, autor=usuario)
+            relatorio = Relatorio(org, **dados, autor=usuario)
             org.relatorios.append(relatorio)
             self.__banco.salva_organizacao(org)
             self.__tela.popup("Relatório criado com sucesso!")
@@ -322,6 +322,10 @@ class ControladorOrganizacao:
             return self.listar_relatorios(usuario, org, cb)
 
         elif acao.startswith("exportar:"):
-            ...
+            nome_relatorio = acao.split(":")[1]
+            relatorio = org.pega_relatorio_por_nome(nome_relatorio)
+            relatorio.exportar()
+
+            self.__tela.popup("Relatório exportado com sucesso!")
 
         self.edita_organizacao(usuario, org.nome, cb)
