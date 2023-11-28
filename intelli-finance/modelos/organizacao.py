@@ -105,6 +105,21 @@ class Organizacao:
         else:
             self.__categorias.append(categoria)
 
+    def pega_relatorio_por_nome(self, nome) -> Relatorio:
+        for relatorio in self.relatorios:
+            if relatorio.nome == nome:
+                return relatorio
+
+    def remove_relatorio(self, nome):
+        idx = -1
+        for i, relatorio in enumerate(self.relatorios):
+            if relatorio.nome == nome:
+                idx = i
+                break
+
+        if idx != -1:
+            self.relatorios.pop(idx)
+
     def remove_categoria(self, categoria: Categoria):
         self.__categorias.remove(categoria)
 

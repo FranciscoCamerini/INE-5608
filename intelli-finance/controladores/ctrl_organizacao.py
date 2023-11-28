@@ -310,5 +310,18 @@ class ControladorOrganizacao:
             self.__tela.popup("Relatório criado com sucesso!")
 
             return self.listar_relatorios(usuario, org, cb)
+        elif acao.startswith("detalhes:"):
+            nome_relatorio = acao.split(":")[1]
+            relatorio = org.pega_relatorio_por_nome(nome_relatorio)
+            acao = self.__tela.mostra_dados_relatorio(relatorio)
+            if acao == "deletar":
+                org.remove_relatorio(nome_relatorio)
+                self.__banco.salva_organizacao(org)
+                self.__tela.popup("Relátorio deletado com sucesso!")
+
+            return self.listar_relatorios(usuario, org, cb)
+
+        elif acao.startswith("exportar:"):
+            ...
 
         self.edita_organizacao(usuario, org.nome, cb)

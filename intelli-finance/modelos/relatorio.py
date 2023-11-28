@@ -1,3 +1,6 @@
+from .usuario import Usuario
+
+
 class Relatorio:
     def __init__(
         self,
@@ -7,7 +10,7 @@ class Relatorio:
         agrupar: str,
         categorias_receita: str,
         categorias_despesa: str,
-        autor: str,
+        autor: Usuario,
     ):
         self.__nome = nome
         self.__data_inicio = data_inicio

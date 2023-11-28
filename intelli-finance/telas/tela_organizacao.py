@@ -546,10 +546,10 @@ class TelaOrganizacao(Tela):
                 layout_relatorios.append(
                     [
                         self.texto(relatorio.nome),
-                        self.botao("Exportar", f"exportar-{relatorio.nome}"),
+                        self.botao("Exportar", f"exportar:{relatorio.nome}"),
                         self.botao(
                             "Detalhes",
-                            f"detalhes-{relatorio.nome}",
+                            f"detalhes:{relatorio.nome}",
                             pad=((20, 0), (0, 0)),
                         ),
                     ]
@@ -566,7 +566,7 @@ class TelaOrganizacao(Tela):
                 ]
             )
 
-            acao, _ = self.abrir()
+            acao, dados = self.abrir()
             self.fechar()
 
         if not listar or acao == "novo":
@@ -597,8 +597,8 @@ class TelaOrganizacao(Tela):
                 ]
             )
 
-        acao, dados = self.abrir()
-        self.fechar()
+            acao, dados = self.abrir()
+            self.fechar()
 
         if acao == "gerar":
             if not dados["nome"]:
@@ -657,3 +657,51 @@ class TelaOrganizacao(Tela):
             )
 
         return acao, dados
+
+    def mostra_dados_relatorio(self, relatorio):
+        layout = [
+            [self.titulo(relatorio.nome)],
+            [self.texto("Autor: ", estilo="bold"), self.texto(relatorio.autor.nome)],
+            [
+                self.texto("Data Início: ", estilo="bold"),
+                self.texto(relatorio.data_inicio),
+            ],
+            [self.texto("Data Fim: ", estilo="bold"), self.texto(relatorio.data_fim)],
+            [
+                self.texto("Agrupar Registros A Cada: ", estilo="bold"),
+                self.texto(relatorio.agrupar),
+            ],
+        ]
+
+        if relatorio.categorias_receita:
+            sublayout = [[self.texto("Categorias Receita: ", estilo="bold")]]
+            sublayout.append(
+                [self.texto(f"- {cat}") for cat in relatorio.categorias_receita]
+            )
+            layout.append(sublayout)
+
+        if relatorio.categorias_despesa:
+            sublayout = [[self.texto("Categorias Receita: ", estilo="bold")]]
+            sublayout.append(
+                [self.texto(f"- {cat}") for cat in relatorio.categorias_receita]
+            )
+            layout.append(sublayout)
+
+        layout.append(
+            [
+                self.botao("Voltar", "voltar", pad=((70, 0), (20, 0))),
+                self.botao(
+                    "Deletar",
+                    "deletar",
+                    pad=((70, 0), (20, 0)),
+                    cor="red",
+                ),
+            ]
+        )
+
+        self.atualiza_tela(layout)
+
+        acao, _ = self.abrir()
+        self.fechar()
+
+        return acao
