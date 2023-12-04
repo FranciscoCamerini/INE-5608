@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from telas.tela_organizacao import TelaOrganizacao
 from bd.banco import Banco
 from modelos.organizacao import Organizacao
@@ -5,6 +7,7 @@ from modelos.usuario import Usuario
 from modelos.categoria import Categoria
 from modelos.relatorio import Relatorio
 from modelos.registro_financeiro import RegistroFinanceiro
+from modelos.log import Log
 
 
 class ControladorOrganizacao:
@@ -110,6 +113,12 @@ class ControladorOrganizacao:
                     org.adiciona_categoria(
                         Categoria(dados["nome"], dados["categoria"], dados["descricao"])
                     )
+                    log = Log(
+                        data=datetime.strftime(datetime.now(), "%d-%m-%Y %H:%M"),
+                        msg=f'{usuario.email} cadastrou uma nova categoria "{dados["nome"]}" de {dados["categoria"]}s',
+                        usuario=usuario,
+                    )
+                    org.adicionar_log(log)
                 except FileExistsError:
                     self.__tela.popup(
                         f"Já existe uma categoria com nome '{dados['nome']}'"
@@ -156,6 +165,8 @@ class ControladorOrganizacao:
                 return self.listar_notificacoes(usuario, org, notificacoes, cb)
             case "relatorio":
                 return self.listar_relatorios(usuario, org, cb)
+            case "log":
+                return self.listar_logs(usuario, org, cb)
 
         return cb(usuario)
 
@@ -194,6 +205,13 @@ class ControladorOrganizacao:
                     )
                 )
 
+                log = Log(
+                    data=datetime.strftime(datetime.now(), "%d-%m-%Y %H:%M"),
+                    msg=f'{usuario.email} adicionou uma despesa de categoria "{dados["categoria"]}" no valor: {abs(float(dados["valor"])) * -1}',
+                    usuario=usuario,
+                )
+                org.adicionar_log(log)
+
                 self.__tela.popup("Despesa adicionada!")
                 self.__banco.altera_organizacao(org.nome, org)
 
@@ -220,6 +238,13 @@ class ControladorOrganizacao:
                     )
                 )
 
+                log = Log(
+                    data=datetime.strftime(datetime.now(), "%d-%m-%Y %H:%M"),
+                    msg=f'{usuario.email} adicionou uma receita de categoria "{dados["categoria"]}" no valor: {abs(float(dados["valor"]))}',
+                    usuario=usuario,
+                )
+                org.adicionar_log(log)
+
                 self.__tela.popup("Receita adicionada!")
                 self.__banco.altera_organizacao(org.nome, org)
 
@@ -239,13 +264,28 @@ class ControladorOrganizacao:
                 registro.descricao = dados["descricao"]
                 registro.data = dados["data"]
 
+                log = Log(
+                    data=datetime.strftime(datetime.now(), "%d-%m-%Y %H:%M"),
+                    msg=f'{usuario.email} editou uma despesa de categoria "{dados["categoria"]}" novo valor: {abs(float(dados["valor"])) * -1}',
+                    usuario=usuario,
+                )
+                org.adicionar_log(log)
+
                 despesas_org[index] = registro
                 org.despesas = despesas_org
                 self.__banco.salva_organizacao(org)
                 self.__tela.popup("Registro alterado com sucesso!")
             elif acao == "deletar":
-                despesas_org.pop(index)
+                registro = despesas_org.pop(index)
                 org.despesas = despesas_org
+
+                log = Log(
+                    data=datetime.strftime(datetime.now(), "%d-%m-%Y %H:%M"),
+                    msg=f'{usuario.email} deletou uma despesa de categoria "{dados["categoria"]}" com valor: {registro.valor}',
+                    usuario=usuario,
+                )
+                org.adicionar_log(log)
+
                 self.__banco.salva_organizacao(org)
                 self.__tela.popup("Registro removido com sucesso!")
 
@@ -265,13 +305,28 @@ class ControladorOrganizacao:
                 registro.descricao = dados["descricao"]
                 registro.data = dados["data"]
 
+                log = Log(
+                    data=datetime.strftime(datetime.now(), "%d-%m-%Y %H:%M"),
+                    msg=f'{usuario.email} editou uma receita de categoria "{dados["categoria"]}" novo valor: {abs(float(dados["valor"]))}',
+                    usuario=usuario,
+                )
+                org.adicionar_log(log)
+
                 receitas_org[index] = registro
                 org.receitas = receitas_org
                 self.__banco.salva_organizacao(org)
                 self.__tela.popup("Registro alterado com sucesso!")
             elif acao == "deletar":
-                receitas_org.pop(index)
+                registro = receitas_org.pop(index)
                 org.receitas = receitas_org
+
+                log = Log(
+                    data=datetime.strftime(datetime.now(), "%d-%m-%Y %H:%M"),
+                    msg=f'{usuario.email} deletou uma receita de categoria "{dados["categoria"]}" com valor: {registro.valor}',
+                    usuario=usuario,
+                )
+                org.adicionar_log(log)
+
                 self.__banco.salva_organizacao(org)
                 self.__tela.popup("Registro removido com sucesso!")
 
@@ -306,6 +361,14 @@ class ControladorOrganizacao:
             dados.pop("senha", None)
             relatorio = Relatorio(org, **dados, autor=usuario)
             org.relatorios.append(relatorio)
+
+            log = Log(
+                data=datetime.strftime(datetime.now(), "%d-%m-%Y %H:%M"),
+                msg=f'{usuario.email} gerou o relatório "{dados["nome"]}"',
+                usuario=usuario,
+            )
+            org.adicionar_log(log)
+
             self.__banco.salva_organizacao(org)
             self.__tela.popup("Relatório criado com sucesso!")
 
@@ -316,6 +379,13 @@ class ControladorOrganizacao:
             acao = self.__tela.mostra_dados_relatorio(relatorio)
             if acao == "deletar":
                 org.remove_relatorio(nome_relatorio)
+                log = Log(
+                    data=datetime.strftime(datetime.now(), "%d-%m-%Y %H:%M"),
+                    msg=f'{usuario.email} deletou o relatório "{nome_relatorio}"',
+                    usuario=usuario,
+                )
+                org.adicionar_log(log)
+
                 self.__banco.salva_organizacao(org)
                 self.__tela.popup("Relátorio deletado com sucesso!")
 
@@ -327,5 +397,10 @@ class ControladorOrganizacao:
             relatorio.exportar()
 
             self.__tela.popup("Relatório exportado com sucesso!")
+
+        self.edita_organizacao(usuario, org.nome, cb)
+
+    def listar_logs(self, usuario, org, cb):
+        self.__tela.listar_logs(org.logs)
 
         self.edita_organizacao(usuario, org.nome, cb)

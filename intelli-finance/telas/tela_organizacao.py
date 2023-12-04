@@ -71,6 +71,7 @@ class TelaOrganizacao(Tela):
                     pad=((0, 0), (55, 0)),
                 )
             )
+            botoes.append(self.botao("Logs", "log", pad=((20, 0), (55, 0))))
             botoes.append(self.botao("Relatório", "relatorio", pad=((20, 0), (55, 0))))
 
         if pode_alterar_dados:
@@ -201,9 +202,7 @@ class TelaOrganizacao(Tela):
             [self.titulo("Proprietário:")],
             [[self.texto(proprietario.nome)], [self.texto(proprietario.email)]],
         ]
-        extra = {}
         if not (func_restritos or administradores):
-            extra["size"] = (400, 200)
             layout.append(
                 [self.texto("Sua organização ainda não possui outros membros.")]
             )
@@ -240,7 +239,7 @@ class TelaOrganizacao(Tela):
 
         layout.append([botoes])
 
-        self.atualiza_tela(layout, extra)
+        self.atualiza_tela(layout)
         acao, _ = self.abrir()
         self.fechar()
 
@@ -530,7 +529,9 @@ class TelaOrganizacao(Tela):
         if not (notificacoes.get("despesas") or notificacoes.get("receitas")):
             layout.append(self.titulo("Não há notificações"))
 
-        self.atualiza_tela([layout, [self.botao("Voltar", "voltar")]])
+        self.atualiza_tela(
+            [layout, [self.botao("Voltar", "voltar", pad=((0, 0), (30, 0)))]]
+        )
 
         self.abrir()
         self.fechar()
@@ -654,9 +655,9 @@ class TelaOrganizacao(Tela):
             layout.append(sublayout)
 
         if relatorio.categorias_despesa:
-            sublayout = [[self.texto("Categorias Receita: ", estilo="bold")]]
+            sublayout = [[self.texto("Categorias Despesa: ", estilo="bold")]]
             sublayout.append(
-                [self.texto(f"- {cat}") for cat in relatorio.categorias_receita]
+                [self.texto(f"- {cat}") for cat in relatorio.categorias_despesa]
             )
             layout.append(sublayout)
 
@@ -678,3 +679,15 @@ class TelaOrganizacao(Tela):
         self.fechar()
 
         return acao
+
+    def listar_logs(self, logs):
+        layout = [[self.titulo("Logs")]]
+
+        for log in logs:
+            layout.append([self.texto(f"- {log.msg}. Data: {log.data}", size=(100, 1))])
+
+        layout.append([self.botao("Voltar", "voltar", pad=((0, 0), (30, 0)))])
+
+        self.atualiza_tela(layout)
+        self.abrir()
+        self.fechar()

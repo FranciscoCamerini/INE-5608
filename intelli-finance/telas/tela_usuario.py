@@ -71,6 +71,7 @@ class TelaUsuario(Tela):
     def login_usuario(self):
         self.atualiza_tela(
             [
+                [self.titulo("Login")],
                 [self.texto("Email:"), self.input("email")],
                 [self.texto("Senha:"), self.input_senha("senha")],
                 [

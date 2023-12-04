@@ -4,6 +4,7 @@ from modelos.usuario import Usuario
 from modelos.categoria import Categoria
 from modelos.registro_financeiro import RegistroFinanceiro
 from modelos.relatorio import Relatorio
+from modelos.log import Log
 
 
 class Organizacao:
@@ -17,6 +18,7 @@ class Organizacao:
         self.__despesas: list[RegistroFinanceiro] = []
         self.__receitas: list[RegistroFinanceiro] = []
         self.__relatorios: list[Relatorio] = []
+        self.__logs: list[Log] = []
 
     @property
     def nome(self):
@@ -61,6 +63,10 @@ class Organizacao:
     @property
     def relatorios(self):
         return self.__relatorios
+
+    @property
+    def logs(self):
+        return self.__logs
 
     def status_usuario(self, usuario):
         if self.proprietario.email == usuario.email:
@@ -185,3 +191,6 @@ class Organizacao:
                 registros.append(despesa)
 
         return registros
+
+    def adicionar_log(self, log: Log):
+        self.__logs.append(log)
